@@ -1,0 +1,16 @@
+{
+  "name": "ictrl",
+  "owner": {
+    "name": "hinatamaxxx"
+  },
+  "metadata": {
+    "description": "iCtrl（Windows から iPhone を操作する MCP サーバー）のプラグイン"
+  },
+  "plugins": [
+    {
+      "name": "ictrl",
+      "source": "./",
+      "description": "Windows から iPhone を USB か同じネットワークで操作する。Windows 専用。"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "description": "Claude の応答が終わったら、iCtrl の UI 自動操作（WebDriverAgent と「AI が操作中」）を止める",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/plugin/ictrl.cmd\" stop-hook",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "ictrl",
+  "description": "Windows から iPhone を USB か同じネットワークで操作する（画面の要素・タップ・文字入力・スクリーンショット）。Windows 専用。",
+  "author": {
+    "name": "hinatamaxxx"
+  },
+  "repository": "https://github.com/hinatamaxxx/ictrl",
+  "license": "GPL-3.0-or-later",
+  "keywords": [
+    "iphone",
+    "ios",
+    "windows",
+    "mirroring",
+    "automation",
+    "mcp"
+  ],
+  "mcpServers": {
+    "ictrl": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "${CLAUDE_PLUGIN_ROOT}\\plugin\\ictrl.cmd",
+        "mcp"
+      ]
+    }
+  },
+  "hooks": "./plugin/hooks.json"
+}

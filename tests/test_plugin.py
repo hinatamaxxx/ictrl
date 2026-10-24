@@ -1,0 +1,41 @@
+"""The Claude Code plugin: its files exist and every install is hash-checked."""
+import hashlib
+import json
+import re
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+class PluginTests(unittest.TestCase):
+    def test_manifests_point_at_the_entry_point(self):
+        plugin = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text("utf-8"))
+        args = plugin["mcpServers"]["ictrl"]["args"]
+        self.assertTrue(any(a.endswith("plugin\\ictrl.cmd") for a in args))
+        hooks = json.loads((ROOT / "plugin" / "hooks.json").read_text("utf-8"))
+        self.assertIn("plugin/ictrl.cmd", hooks["hooks"]["Stop"][0]["hooks"][0]["command"])
+        self.assertTrue((ROOT / "plugin" / "ictrl.cmd").exists())
+        self.assertTrue((ROOT / "plugin" / "launch.py").exists())
+
+    def test_entry_point_is_crlf_and_ascii(self):
+        data = (ROOT / "plugin" / "ictrl.cmd").read_bytes()
+        data.decode("ascii")                      # cmd reads it in the console's code page
+        self.assertNotIn(b"\n", data.replace(b"\r\n", b""))
+
+    def test_every_requirement_has_a_hash(self):
+        text = (ROOT / "requirements.txt").read_text("utf-8")
+        entries = re.split(r"\n(?=[A-Za-z])", re.sub(r"(?m)^#.*\n", "", text).strip())
+        for entry in entries:
+            with self.subTest(entry.splitlines()[0]):
+                self.assertRegex(entry, r"--hash=sha256:[0-9a-f]{64}")
+
+    def test_bundled_wheels_match_their_hashes(self):
+        text = (ROOT / "requirements.txt").read_text("utf-8")
+        for wheel in (ROOT / "wheels").glob("*.whl"):
+            with self.subTest(wheel.name):
+                self.assertIn(hashlib.sha256(wheel.read_bytes()).hexdigest(), text)
+
+
+if __name__ == "__main__":
+    unittest.main()
