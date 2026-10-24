@@ -2,6 +2,7 @@
 
     .venv\\Scripts\\python.exe tools\\release_wda.py            # Appium's latest release
     .venv\\Scripts\\python.exe tools\\release_wda.py v16.15.3   # a given Appium release
+    .venv\\Scripts\\python.exe tools\\release_wda.py --repo OWNER/NAME  # another repository
 
 The IPA is Appium's real-device WebDriverAgent build with only the bundle ID
 and the display name changed (ictrl.wda.build_ipa). WebDriverAgent is
@@ -37,6 +38,7 @@ def appium_release(tag: str | None) -> dict:
 
 
 def main(argv: list[str]) -> None:
+    sys.stdout.reconfigure(encoding="utf-8")   # a pipe would get the console's code page
     target: list[str] = []
     if "--repo" in argv:
         i = argv.index("--repo")
