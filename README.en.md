@@ -14,7 +14,7 @@ iCtrl lets the AI on your PC (such as Claude) operate your iPhone. Ask Claude so
 
 - Shows the iPhone's screen on the PC (no sound)
 - Click to tap, scroll with the mouse wheel, type with the PC keyboard (Japanese input included)
-- Paste text and images copied on the iPhone into the PC, and paste text and images copied on the PC into the iPhone
+- Copy and paste text and images between the iPhone and the PC
 - Saves screenshots of the iPhone on the PC
 - Lets Claude operate the iPhone for you
 
@@ -68,8 +68,6 @@ codex plugin add ictrl@ictrl
 
 Then ask "open the iCtrl screen" in a new thread. Below, read "Claude" as Codex.
 
-While this repository is private, the plugin installs only on PCs signed in to a GitHub account that can see it.
-
 ### Use it as an app, without Claude
 
 iCtrl also runs as an ordinary Windows app without Claude (opened from the Start menu, in its own window; it needs Python). To use it that way, give an AI agent such as Claude Code or Codex this repository's URL and ask it to "install it as an app": it follows [AGENTS.md](AGENTS.md).
@@ -89,6 +87,7 @@ iCtrl is made of a part that runs in the background (the server) and the screen 
 
 - **Start**: ask Claude to "open the iCtrl screen", or to do something on the iPhone: the server starts on its own. The screen appears in the browser on the right side of the Claude app.
 - **Stop**: 30 seconds after the screen is closed, the iPhone connection closes, and the server exits 1 minute later. The short wait keeps a screen that was only hidden for a moment from losing its connection. While Claude uses iCtrl, it keeps running.
+- **If the server stopped while the screen is open**: press "Connect via USB" or "Connect via Wi-Fi" on the screen: the server starts, then connects. This works while a conversation with Claude is open; otherwise, ask Claude to "connect to iCtrl".
 
 While only the server runs, no icon appears on the taskbar or in the notification area. Installed as an app, iCtrl starts from "iCtrl" in the Start menu and ends as soon as you close its window.
 

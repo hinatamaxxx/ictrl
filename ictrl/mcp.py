@@ -310,7 +310,11 @@ def handle_tool(client: Client, name: str, args: dict) -> list[dict]:
 
 
 def run(port: int) -> None:
+    from . import starter
     client = Client(port)
+    # An iCtrl screen left open in the agent's browser can ask this process
+    # to start the server again (starter.py).
+    starter.offer(port, lambda: ensure_server(port))
     sys.stdin.reconfigure(encoding="utf-8")
     sys.stdout.reconfigure(encoding="utf-8", newline="\n")
     out = sys.stdout
@@ -348,6 +352,7 @@ def run(port: int) -> None:
         elif method == "tools/list":
             result = {"tools": TOOLS}
         elif method == "tools/call":
+            starter.offer(port, lambda: ensure_server(port))   # free again: another session ended
             params = msg.get("params", {})
             try:
                 content = handle_tool(client, params.get("name"), params.get("arguments") or {})

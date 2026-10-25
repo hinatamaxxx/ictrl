@@ -76,9 +76,11 @@ function toast(msg, bad = false, action = null) {
   toast.timer = setTimeout(() => t.classList.remove("show"), bad ? 5000 : action ? 6000 : 2200);
 }
 
-// The page cannot start the iCtrl server itself (it runs in a browser): when
-// the server is not running, say who can start it instead of "Failed to fetch".
-const SERVER_DOWN = "iCtrl のサーバーが止まっています。Claude などの AI に「iCtrl につないで」と頼むと起動し、この画面も自動でつながります";
+// The page cannot start the iCtrl server itself (it runs in a browser). The
+// connect buttons ask the agent's MCP process to (startServer); other actions
+// say so instead of "Failed to fetch".
+const SERVER_DOWN = "iCtrl のサーバーが止まっています。接続ボタンを押すと起動します";
+const SERVER_START_FAILED = "iCtrl のサーバーを起動できませんでした。Claude などの AI に「iCtrl につないで」と頼むと起動し、この画面も自動でつながります";
 async function api(path, body) {
   // The socket already knows the server is gone: answer at once instead of
   // waiting about 2 s for Windows to refuse the connection.
@@ -447,6 +449,7 @@ function connectSocket() {
   state.ws = ws;
   ws.onopen = () => {
     state.serverDown = false;
+    serverWaiters.splice(0).forEach((resolve) => resolve(true));
     videoOn = null;                         // a new socket: tell the server again
     setVideo(!document.hidden);
   };
@@ -1286,8 +1289,26 @@ async function chooseTransport(t) {
 }
 $$("#quickTransport button").forEach((b) => b.addEventListener("click", () => chooseTransport(b.dataset.transport)));
 
+// The server is gone: ask the agent's MCP process to start it (ictrl/starter.py,
+// the next port; it only accepts this page's origin), then wait for this
+// page's socket to reopen. Then the connect the user pressed goes on.
+const serverWaiters = [];
+async function startServer() {
+  toast(t("iCtrl のサーバーを起動しています…"));
+  const opened = new Promise((resolve) => serverWaiters.push(resolve));
+  let wait = 10000;
+  try {
+    await fetch(`http://${location.hostname}:${Number(location.port) + 1}/start`, { method: "POST", mode: "no-cors" });
+  } catch (_) {
+    // No agent session offers it, or a localhost-filtering proxy (AdGuard)
+    // cut the reply after the server was started: the socket tells which.
+    wait = 3000;
+  }
+  return Promise.race([opened, new Promise((resolve) => setTimeout(() => resolve(false), wait))]);
+}
 async function doConnect(transport) {
   setTransport(transport);
+  if (state.serverDown && !(await startServer())) return toast(t(SERVER_START_FAILED), true);
   const udid = $("#deviceSelect").value || undefined;
   try {
     await api("/api/connect", { transport, udid });
