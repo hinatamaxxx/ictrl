@@ -12,15 +12,18 @@ function cached() {
   try { return localStorage.getItem(CACHE) || "auto"; } catch (_) { return "auto"; }
 }
 
-export const SETTING = cached();
-export const LANG = resolve(SETTING);
+export let SETTING = cached();
+export let LANG = resolve(SETTING);
 
-// Whether the saved setting differs from the one this page was drawn with
-// (another window changed it): the caller reloads.
+// Take a saved setting (this window's choice, or another window's). Returns
+// whether the language changed: the caller then relabels the page in place.
 export function adopt(setting) {
-  setting = setting || "auto";
-  try { localStorage.setItem(CACHE, setting); } catch (_) {}
-  return resolve(setting) !== LANG;
+  SETTING = setting || "auto";
+  try { localStorage.setItem(CACHE, SETTING); } catch (_) {}
+  const lang = resolve(SETTING);
+  if (lang === LANG) return false;
+  LANG = lang;
+  return true;
 }
 
 export function t(ja, vars) {
@@ -51,24 +54,42 @@ export function fromServer(message) {
   return message;
 }
 
-// index.html: text nodes and labels are translated by their exact Japanese
-// text; paragraphs with markup inside carry data-i18n and are replaced whole.
+// index.html and text app.js has put on the page: each text node and label
+// is looked up by its Japanese text, or by its English text (JA_OF) when the
+// page is being switched back. Paragraphs with markup inside carry data-i18n
+// and are replaced whole. The user's own data (clipboard items, app names,
+// device details, the save folder) is never touched; device names in the
+// list do not match any entry.
+const ORIGINAL = new WeakMap();
+const OWN_DATA = ".clips li:not(.muted), .apps li:not(.muted), #facts dd, #shotFolder";
+let JA_OF = null;
+function relabel(text) {
+  JA_OF ??= Object.fromEntries(Object.entries(EN).map(([ja, en]) => [en, ja]));
+  const ja = EN[text] !== undefined ? text : JA_OF[text];
+  return ja === undefined ? null : LANG === "en" ? EN[ja] : ja;
+}
+
 export function translatePage(root = document.body) {
   document.documentElement.lang = LANG;
-  if (LANG !== "en") return;
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: (node) => node.parentElement?.closest(OWN_DATA) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+  });
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const text = node.nodeValue.trim();
-    if (text && EN[text] !== undefined) node.nodeValue = node.nodeValue.replace(text, EN[text]);
+    const next = text && relabel(text);
+    if (next && next !== text) node.nodeValue = node.nodeValue.replace(text, next);
   }
   for (const el of root.querySelectorAll("[title], [placeholder], [aria-label]")) {
+    if (el.closest(OWN_DATA) && !el.matches("button")) continue;
     for (const attr of ["title", "placeholder", "aria-label"]) {
       const value = el.getAttribute(attr);
-      if (value && EN[value] !== undefined) el.setAttribute(attr, EN[value]);
+      const next = value && relabel(value);
+      if (next && next !== value) el.setAttribute(attr, next);
     }
   }
   for (const el of root.querySelectorAll("[data-i18n]")) {
-    if (EN_HTML[el.dataset.i18n]) el.innerHTML = EN_HTML[el.dataset.i18n];
+    if (!ORIGINAL.has(el)) ORIGINAL.set(el, el.innerHTML);
+    el.innerHTML = LANG === "en" && EN_HTML[el.dataset.i18n] ? EN_HTML[el.dataset.i18n] : ORIGINAL.get(el);
   }
 }
 
@@ -192,7 +213,7 @@ const EN = {
   "未接続": "Offline",
   "AI が操作中": "AI at work",
   "映像の統計": "Video statistics",
-  "接続方法": "Connection",
+  "接続方法": "Connection method",
   "切断": "Disconnect",
   "メニュー (Ctrl+B)": "Menu (Ctrl+B)",
   "iPhone の画面": "iPhone screen",
@@ -403,8 +424,8 @@ const EN = {
   "アプリを起動": "Opening an app",
   "画面を確認": "Checking the screen",
   "アプリ一覧を取得": "Getting the app list",
-  "クリップボードを操作": "Clipboard",
-  "接続を操作": "Connection",
+  "クリップボードを操作": "Using the clipboard",
+  "接続を操作": "Changing the connection",
   "画面の要素を確認": "Reading screen elements",
   "操作": "Operation",
 };

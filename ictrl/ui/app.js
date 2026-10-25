@@ -91,10 +91,10 @@ function send(obj) {
 }
 
 const STAGES = {
-  ownership: t("接続を準備中"), usbmux: t("USB の iPhone を探しています"), bonjour: t("Wi-Fi で iPhone を探しています"), remote_pairing: t("Wi-Fi で接続中"), wifi_pairing: t("Wi-Fi で使う準備中"), lockdown: t("iPhone に接続中"), pairing: t("iPhone で「このコンピュータを信頼」を押してください"),
-  developer_mode: t("デベロッパモードを確認中"), developer_image: t("iPhone の画面機能を準備中"),
-  tunnel: t("iPhone との通信を準備中"), display_info: t("画面の情報を取得中"), display_stream: t("画面の映像を開始中"),
-  hid: t("操作の準備中"), ready: t("準備完了"),
+  ownership: "接続を準備中", usbmux: "USB の iPhone を探しています", bonjour: "Wi-Fi で iPhone を探しています", remote_pairing: "Wi-Fi で接続中", wifi_pairing: "Wi-Fi で使う準備中", lockdown: "iPhone に接続中", pairing: "iPhone で「このコンピュータを信頼」を押してください",
+  developer_mode: "デベロッパモードを確認中", developer_image: "iPhone の画面機能を準備中",
+  tunnel: "iPhone との通信を準備中", display_info: "画面の情報を取得中", display_stream: "画面の映像を開始中",
+  hid: "操作の準備中", ready: "準備完了",
 };
 
 // ------------------------------------------------------------------ status
@@ -118,9 +118,9 @@ const MODEL_NAMES = {
   "iPhone17,1": "iPhone 16 Pro", "iPhone17,2": "iPhone 16 Pro Max", "iPhone17,3": "iPhone 16", "iPhone17,4": "iPhone 16 Plus",
   "iPhone17,5": "iPhone 16e", "iPhone16,1": "iPhone 15 Pro", "iPhone16,2": "iPhone 15 Pro Max",
   "iPhone15,4": "iPhone 15", "iPhone15,5": "iPhone 15 Plus", "iPhone15,2": "iPhone 14 Pro", "iPhone15,3": "iPhone 14 Pro Max",
-  "iPhone14,7": "iPhone 14", "iPhone14,8": "iPhone 14 Plus", "iPhone14,6": t("iPhone SE (第3世代)"),
+  "iPhone14,7": "iPhone 14", "iPhone14,8": "iPhone 14 Plus", "iPhone14,6": "iPhone SE (第3世代)",
 };
-function modelName(id) { return MODEL_NAMES[id] || id || "iPhone"; }
+function modelName(id) { return t(MODEL_NAMES[id]) || id || "iPhone"; }
 
 function renderCorners(s) {
   if (!s.screen) return;
@@ -158,7 +158,7 @@ function setStatusText(label) {
 function statusLabel(s) {
   // No USB / Wi-Fi here: the transport buttons beside it already show it.
   // Over Wi-Fi the name is not known: show what is (the product, iOS).
-  const device = s.name || [MODEL_NAMES[s.model] || "iPhone", s.ios && `iOS ${s.ios}`].filter(Boolean).join(" · ");
+  const device = s.name || [t(MODEL_NAMES[s.model]) || "iPhone", s.ios && `iOS ${s.ios}`].filter(Boolean).join(" · ");
   return {
     idle: t("未接続"), closed: t("切断しました"), closing: t("切断中…"),
     // Short and fixed while connecting: the phone area shows the stage, and
@@ -179,8 +179,8 @@ function renderStatus() {
   pill.className = "pill " + (s.state || "idle");
   setStatusText(statusLabel(s));
   // Details only on hover: iOS version and model.
-  pill.title = s.state === "ready" ? [MODEL_NAMES[s.model], `iOS ${s.ios || "?"}`].filter(Boolean).join(" · ") :
-    s.state === "connecting" ? (STAGES[s.stage] || "") : "";
+  pill.title = s.state === "ready" ? [t(MODEL_NAMES[s.model]), `iOS ${s.ios || "?"}`].filter(Boolean).join(" · ") :
+    s.state === "connecting" ? t(STAGES[s.stage] || "") : "";
 
   const live = s.state === "ready";
   device.classList.toggle("live", live);
@@ -197,7 +197,7 @@ function renderStatus() {
   // only (no second set of connect buttons).
   $(".empty-actions").hidden = live || s.state === "connecting";
   $("#progress").hidden = s.state !== "connecting";
-  $("#progressText").textContent = STAGES[s.stage] || "";
+  $("#progressText").textContent = t(STAGES[s.stage] || "");
   $$(".empty-actions .btn").forEach((b) => (b.disabled = s.state === "connecting"));
   const err = $("#errorText");
   err.hidden = !s.error || live;
@@ -1384,14 +1384,14 @@ function onClipboardEvent(msg) {
 }
 // WebDriverAgent mode: on demand / off (OCR only).
 const WDA_MODE_HELP = {
-  on_demand: t("AI が要素を読むときに起動し、作業が終わると止めます。起動のたびに iPhone がパスコードを求めることがあります。"),
-  off: t("WebDriverAgent を使わず、画面の文字を Windows の文字認識で読みます。パスコード要求は出ませんが、遅く、文字のないアイコンは読めません。"),
+  on_demand: "AI が要素を読むときに起動し、作業が終わると止めます。起動のたびに iPhone がパスコードを求めることがあります。",
+  off: "WebDriverAgent を使わず、画面の文字を Windows の文字認識で読みます。パスコード要求は出ませんが、遅く、文字のないアイコンは読めません。",
 };
 function applyWdaMode(settings) {
   if (!("wda_mode" in settings) && settings.t === "settings") return;
   const mode = settings.wda_mode || "on_demand";
   $("#wdaMode").value = mode;
-  $("#wdaModeHelp").textContent = WDA_MODE_HELP[mode] || "";
+  $("#wdaModeHelp").textContent = t(WDA_MODE_HELP[mode] || "");
 }
 $("#wdaMode").addEventListener("change", async (ev) => {
   try { applyWdaMode(await api("/api/settings", { wda_mode: ev.target.value })); }
@@ -1434,18 +1434,22 @@ $("#autoDisconnect").addEventListener("change", async (ev) => {
 api("/api/settings").then(applyAutoDisconnect).catch(() => {});
 
 // Display language (i18n.js): "auto" follows the browser. A change, here or
-// in another window, redraws the page in the new language; an open menu stays
-// open where it was (restoreMenu at boot).
+// in another window, relabels the page in place: no reload, so the video,
+// the connection and the open menu stay as they are.
 $("#language").value = SETTING;
 function applyLanguage(settings) {
   if (!("language" in settings)) return;
   $("#language").value = settings.language;
   if (!adopt(settings.language)) return;
-  if ($(".workspace").classList.contains("panel-open")) {
-    try { sessionStorage.setItem("ictrl.menu", String($("#panel").scrollTop)); } catch (_) {}
-  }
-  send({ t: "reloading" });
-  location.reload();
+  translatePage();
+  renderStatus();
+  renderKbd();
+  renderAgentBadge();
+  renderApps();
+  applyWdaMode({ wda_mode: $("#wdaMode").value });
+  refreshPasscode();
+  loadDevices();
+  loadClips();
 }
 $("#language").addEventListener("change", async (ev) => {
   try { applyLanguage(await api("/api/settings", { language: ev.target.value })); }
@@ -1573,24 +1577,12 @@ function setMenu(open) {
 function togglePanel() { setMenu(!$(".workspace").classList.contains("panel-open")); }
 $("#panelToggle").addEventListener("click", togglePanel);
 $("#menuBackdrop").addEventListener("pointerdown", (ev) => { ev.preventDefault(); setMenu(false); });
-// After a language change the menu comes back open, without sliding in again.
-function restoreMenu() {
-  let scroll = null;
-  try { scroll = sessionStorage.getItem("ictrl.menu"); sessionStorage.removeItem("ictrl.menu"); } catch (_) {}
-  if (scroll === null) return;
-  const panel = $("#panel");
-  panel.style.transition = "none";
-  setMenu(true);
-  panel.scrollTop = Number(scroll) || 0;
-  requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.transition = ""; }));
-}
 
 // boot
 // The app window is WebView2 (window/iCtrlWindow.cs); Chrome works too. The
 // video is HEVC decoded by WebCodecs on the GPU.
 if (typeof VideoDecoder === "undefined") toast(t("この画面では映像を再生できません（WebCodecs に対応したブラウザーが必要です）"), true);
 setTransport(state.transport);
-restoreMenu();
 renderStatus();
 connectSocket();
 loadDevices();
