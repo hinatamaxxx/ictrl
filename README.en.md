@@ -87,7 +87,6 @@ iCtrl is made of a part that runs in the background (the server) and the screen 
 
 - **Start**: ask Claude to "open the iCtrl screen", or to do something on the iPhone: the server starts on its own. The screen appears in the browser on the right side of the Claude app.
 - **Stop**: 30 seconds after the screen is closed, the iPhone connection closes, and the server exits 1 minute later. The short wait keeps a screen that was only hidden for a moment from losing its connection. While Claude uses iCtrl, it keeps running.
-- **If the server stopped while the screen is open**: press "Connect via USB" or "Connect via Wi-Fi" on the screen: the server starts, then connects. This works while a conversation with Claude is open; otherwise, ask Claude to "connect to iCtrl".
 
 While only the server runs, no icon appears on the taskbar or in the notification area. Installed as an app, iCtrl starts from "iCtrl" in the Start menu and ends as soon as you close its window.
 

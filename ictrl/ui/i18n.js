@@ -346,10 +346,7 @@ const EN = {
   "画面": "Screen",
   "映像": "Video",
   "待機中": "Idle",
-  "iCtrl のサーバーが止まっています。接続ボタンを押すと起動します": "The iCtrl server is not running. Press a connect button to start it",
-  "iCtrl のサーバーを起動しています…": "Starting the iCtrl server…",
-  "iCtrl のサーバーを起動できませんでした。Claude などの AI に「iCtrl につないで」と頼むと起動し、この画面も自動でつながります":
-    "Could not start the iCtrl server. Ask an AI such as Claude to \"connect to iCtrl\": it starts the server, and this screen reconnects by itself",
+  "接続できませんでした。Claude などの AI に「iCtrl につないで」と頼んでください": "Could not connect. Ask an AI such as Claude to \"connect to iCtrl\"",
   "日本語入力": "Japanese input",
   "英字入力": "English input",
   "（クリック / 半角全角キーで切替。Windows と iPhone の両方が切り替わります）": " (click or the Hankaku/Zenkaku key to switch; both Windows and the iPhone switch)",

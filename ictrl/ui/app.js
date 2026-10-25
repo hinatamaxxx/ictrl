@@ -77,10 +77,11 @@ function toast(msg, bad = false, action = null) {
 }
 
 // The page cannot start the iCtrl server itself (it runs in a browser). The
-// connect buttons ask the agent's MCP process to (startServer); other actions
-// say so instead of "Failed to fetch".
-const SERVER_DOWN = "iCtrl のサーバーが止まっています。接続ボタンを押すと起動します";
-const SERVER_START_FAILED = "iCtrl のサーバーを起動できませんでした。Claude などの AI に「iCtrl につないで」と頼むと起動し、この画面も自動でつながります";
+// connect buttons ask the agent's MCP process to (startServer); the user only
+// sees "connecting". Other actions ask for a connection instead of showing
+// "Failed to fetch".
+const SERVER_DOWN = "先に iPhone に接続してください";
+const SERVER_START_FAILED = "接続できませんでした。Claude などの AI に「iCtrl につないで」と頼んでください";
 async function api(path, body) {
   // The socket already knows the server is gone: answer at once instead of
   // waiting about 2 s for Windows to refuse the connection.
@@ -529,7 +530,7 @@ function connectSocket() {
     // never reopened automatically).
     state.ws = null;
     state.serverDown = true;
-    state.status = { state: "idle", error: t(SERVER_DOWN) };
+    state.status = { state: "idle" };
     renderStatus();
     setTimeout(connectSocket, 1000);
   };
@@ -1294,7 +1295,8 @@ $$("#quickTransport button").forEach((b) => b.addEventListener("click", () => ch
 // page's socket to reopen. Then the connect the user pressed goes on.
 const serverWaiters = [];
 async function startServer() {
-  toast(t("iCtrl のサーバーを起動しています…"));
+  state.status = { state: "connecting", transport: state.transport };
+  renderStatus();
   const opened = new Promise((resolve) => serverWaiters.push(resolve));
   let wait = 10000;
   try {
@@ -1308,7 +1310,11 @@ async function startServer() {
 }
 async function doConnect(transport) {
   setTransport(transport);
-  if (state.serverDown && !(await startServer())) return toast(t(SERVER_START_FAILED), true);
+  if (state.serverDown && !(await startServer())) {
+    state.status = { state: "idle" };
+    renderStatus();
+    return toast(t(SERVER_START_FAILED), true);
+  }
   const udid = $("#deviceSelect").value || undefined;
   try {
     await api("/api/connect", { transport, udid });
