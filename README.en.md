@@ -203,8 +203,8 @@ We recommend turning off "Allow Running When Locked" in the settings of ictrlcop
 
 - iCtrl only operates an iPhone connected over USB or on the same Wi-Fi network. It cannot be used from outside.
 - iCtrl closes the connection to the iPhone when it is not in use, and never reconnects on its own. It closes it:
-  - when Claude finishes, even if the iCtrl screen is open in Claude's browser (not while you have the app window open);
-  - after 5 minutes with no operation by a person or by Claude, even with the iCtrl screen open;
+  - when Claude or Codex finishes, even if the iCtrl screen is open in its browser (not while you have the app window open);
+  - after 5 minutes with no operation by a person or by the AI, even with the iCtrl screen open;
   - 30 seconds after the iCtrl screen is closed or hidden.
 - To keep the connection, turn on "使っていなくても接続を続ける（非推奨）" (keep the connection even when unused; not recommended) in the menu.
 - When there has been no connection and no open screen for 1 minute, iCtrl itself exits. It does not start with Windows.
