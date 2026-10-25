@@ -1417,12 +1417,13 @@ $("#showImeButton").addEventListener("change", async (ev) => {
 });
 api("/api/settings").then(applyShowImeButton).catch(() => {});
 
-// Close the connection when nothing uses it (no iCtrl window, no agent).
+// "Keep the connection even when unused (not recommended)": on turns the
+// automatic disconnects (auto_disconnect) off.
 function applyAutoDisconnect(settings) {
-  if ("auto_disconnect" in settings) $("#autoDisconnect").checked = settings.auto_disconnect !== false;
+  if ("auto_disconnect" in settings) $("#autoDisconnect").checked = settings.auto_disconnect === false;
 }
 $("#autoDisconnect").addEventListener("change", async (ev) => {
-  try { applyAutoDisconnect(await api("/api/settings", { auto_disconnect: ev.target.checked })); }
+  try { applyAutoDisconnect(await api("/api/settings", { auto_disconnect: !ev.target.checked })); }
   catch (e) { toast(e.message, true); }
 });
 api("/api/settings").then(applyAutoDisconnect).catch(() => {});

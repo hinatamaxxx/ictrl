@@ -28,11 +28,54 @@ class IdleDisconnectTests(unittest.IsolatedAsyncioTestCase):
         await self.settle()
         m.disconnect.assert_awaited_once()
 
-    async def test_an_open_window_keeps_the_connection(self):
+    async def test_the_app_window_on_screen_keeps_the_connection(self):
         m = self.make()
-        m.window_opened()
+        m.window_opened(app=True)
         m.agent_started(); m.agent_ended(); m.agent_finished()
         await self.settle()
+        m.disconnect.assert_not_awaited()
+
+    async def test_a_screen_in_the_agents_browser_does_not_keep_it(self):
+        m = self.make()
+        m.window_opened()                             # Claude's browser pane
+        m.agent_started(); m.agent_ended(); m.agent_finished()
+        await self.settle()
+        m.disconnect.assert_awaited_once()
+
+    async def test_no_use_closes_it_even_with_a_screen_open(self):
+        m = self.make()
+        with mock.patch.object(manager_module, "IDLE_NO_USE", 0.02):
+            m.window_opened(app=True)
+            m.person_used()
+            await asyncio.sleep(0.06)
+        m.disconnect.assert_awaited_once()
+
+    async def test_a_persons_operation_restarts_the_wait(self):
+        m = self.make()
+        with mock.patch.object(manager_module, "IDLE_NO_USE", 0.06):
+            m.window_opened(app=True)
+            m.person_used()
+            await asyncio.sleep(0.04)
+            m.person_used()
+            await asyncio.sleep(0.04)
+            m.disconnect.assert_not_awaited()
+            await asyncio.sleep(0.05)
+        m.disconnect.assert_awaited_once()
+
+    async def test_no_use_waits_for_an_agent_at_work(self):
+        m = self.make()
+        with mock.patch.object(manager_module, "IDLE_NO_USE", 0.02):
+            m.window_opened(app=True)
+            m.agent_started()
+            await asyncio.sleep(0.05)
+        m.disconnect.assert_not_awaited()
+
+    async def test_keeping_the_connection_turns_no_use_off(self):
+        m = self.make()
+        m.settings["auto_disconnect"] = False
+        with mock.patch.object(manager_module, "IDLE_NO_USE", 0.02):
+            m.person_used()
+            await asyncio.sleep(0.05)
         m.disconnect.assert_not_awaited()
 
     async def test_closing_the_last_window_waits_then_disconnects(self):

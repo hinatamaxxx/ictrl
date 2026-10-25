@@ -167,6 +167,8 @@ def create_app(port: int) -> Starlette:
             # "AI が操作中" for a moment as the chat ends.
             finishing = path == "/api/automation/stop"
             tracked = is_agent and path not in passive and not finishing
+            if not is_agent and path not in passive:
+                manager.person_used()               # e.g. the screenshot button, a paste
             if tracked:
                 manager.agent_started()
                 manager.notify({"t": "agent", "phase": "start", "running": manager.agent_running,
@@ -866,7 +868,7 @@ def create_app(port: int) -> Starlette:
                 on = bool(message.get("on", True))
                 if window and on != shown:
                     shown = on
-                    manager.window_opened() if on else manager.window_closed()
+                    manager.window_opened(app_window) if on else manager.window_closed(app_window)
                 if video_task:
                     video_task.cancel()
                     video_task = None
@@ -904,6 +906,8 @@ def create_app(port: int) -> Starlette:
                 if agent_socket:
                     # A script driving the phone over the socket, not the GUI.
                     manager.notify({"t": "agent", "phase": "pulse", "op": t})
+                elif window and t in ("touch", "button", "keys", "text", "key", "lock"):
+                    manager.person_used()          # not pc_keyboard / release: the page sends those itself
                 relinked = t == "pc_keyboard" and message.get("on", True) and not session.pc_keyboard
                 future = session.submit(ops[t](message))
                 if relinked:
@@ -948,7 +952,7 @@ def create_app(port: int) -> Starlette:
             pass
         finally:
             if shown:
-                manager.window_closed()
+                manager.window_closed(app_window)
             if window:
                 manager.page_closed()
             if app_window and not reloading:

@@ -43,6 +43,9 @@ WDA_MODES = ("on_demand", "off")
 # nothing keeps reaching the phone in the background.
 IDLE_AFTER_WINDOW = 30      # s after the last window closed (a reload comes back sooner)
 IDLE_AFTER_AGENT = 300      # s after an agent's last request, if it never said it finished
+# Even with an iCtrl screen open: no operation by a person (taps, keys from an
+# iCtrl screen) and no agent request for this long closes the connection.
+IDLE_NO_USE = 300
 # With no page open, no iPhone connection and no agent request, the server
 # itself ends (a window or an agent starts it again when needed).
 SERVER_IDLE_EXIT = 60
@@ -63,6 +66,8 @@ class Manager:
         self.agent_running = 0               # agent requests in progress
         self._idle_task: Optional[asyncio.Task] = None
         self._automation_task: Optional[asyncio.Task] = None
+        self._use_task: Optional[asyncio.Task] = None
+        self.app_windows = 0                 # of those on screen: the app window (iCtrlWindow)
         self.pages = 0                       # iCtrl pages connected, shown or hidden
         self._exit_task: Optional[asyncio.Task] = None
         self.on_unused = None                # set by the server: ends the process
@@ -220,6 +225,7 @@ class Manager:
         if ready and not self._was_ready:
             # Just connected: the iPhone starts in its own input mode.
             asyncio.get_running_loop().create_task(self.follow_windows_ime("connect", force=True))
+            self._arm_no_use()
         self._was_ready = ready
         if info.state in ("closed", "failed"):
             self.arm_exit()                   # the last use may have been this connection
@@ -466,18 +472,47 @@ class Manager:
 
         self._exit_task = asyncio.get_running_loop().create_task(exit_when_unused())
 
-    def window_opened(self) -> None:
+    def window_opened(self, app: bool = False) -> None:
         self.windows += 1
+        self.app_windows += bool(app)
         self._cancel_idle()
 
-    def window_closed(self) -> None:
+    def window_closed(self, app: bool = False) -> None:
         self.windows = max(0, self.windows - 1)
+        if app:
+            self.app_windows = max(0, self.app_windows - 1)
         self._arm_idle(IDLE_AFTER_WINDOW, "the last iCtrl window closed")
+
+    def person_used(self) -> None:
+        """A person operated the phone from an iCtrl screen."""
+        self._arm_no_use()
+
+    def _arm_no_use(self) -> None:
+        """Close the connection after IDLE_NO_USE with no operation by a
+        person and no agent request, whether or not a screen is open: an open
+        screen alone does not keep the phone connected."""
+        if self._use_task is not None:
+            self._use_task.cancel()
+
+        async def close_when_unused():
+            await asyncio.sleep(IDLE_NO_USE)
+            self._use_task = None
+            if self.agent_running or not self._connected():
+                return                       # an agent at work re-arms this when it ends
+            if not self.settings.get("auto_disconnect", True):
+                return
+            log.info("not in use (no operation by a person or an agent for %d s): "
+                     "closing the iPhone connection", IDLE_NO_USE)
+            await self.disconnect()
+            self.arm_exit()
+
+        self._use_task = asyncio.get_running_loop().create_task(close_when_unused())
 
     def agent_started(self) -> None:
         self.agent_running += 1
         self._cancel_idle()
         self._cancel_exit()
+        self._arm_no_use()
         if self._automation_task is not None:
             self._automation_task.cancel()
             self._automation_task = None
@@ -485,6 +520,7 @@ class Manager:
     def agent_ended(self) -> None:
         self.agent_running = max(0, self.agent_running - 1)
         self._arm_idle(IDLE_AFTER_AGENT, "no request from the agent")
+        self._arm_no_use()
         self._arm_automation_end()
         self.arm_exit()
 
@@ -511,8 +547,21 @@ class Manager:
         self._automation_task = asyncio.get_running_loop().create_task(end_when_idle())
 
     def agent_finished(self) -> None:
-        """The agent said it is done (ictrl_finish, Claude Code's Stop hook)."""
-        self._arm_idle(0, "the agent finished")
+        """The agent said it is done (ictrl_finish, Claude Code's Stop hook):
+        close the connection now, even if its screen is open in the agent's
+        browser. Only the person's own app window on screen keeps it."""
+        if not self.settings.get("auto_disconnect", True):
+            return
+        if self.app_windows or self.agent_running or not self._connected():
+            return
+        self._cancel_idle()
+
+        async def close_now():
+            log.info("not in use (the agent finished): closing the iPhone connection")
+            await self.disconnect()
+            self.arm_exit()
+
+        self._idle_task = asyncio.get_running_loop().create_task(close_now())
 
     def _cancel_idle(self) -> None:
         if self._idle_task is not None:
