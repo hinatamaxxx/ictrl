@@ -77,11 +77,11 @@ iCtrl also runs as an ordinary Windows app without Claude (opened from the Start
 ## Connect the iPhone for the first time
 
 1. Connect the iPhone to the PC with a USB cable.
-2. On the iCtrl screen, press "USB で接続" (Connect over USB).
+2. On the iCtrl screen, press "Connect via USB".
 3. When the iPhone asks "Trust This Computer?", tap "Trust" and enter the iPhone's passcode.
 4. When the iPhone's screen appears, you are done.
 
-This also prepares the Wi-Fi connection. From then on, if the PC and the iPhone are on the same Wi-Fi network, press "Wi-Fi で接続" (Connect over Wi-Fi), with no cable.
+This also prepares the Wi-Fi connection. From then on, if the PC and the iPhone are on the same Wi-Fi network, press "Connect via Wi-Fi", with no cable.
 
 ## Start and stop
 
@@ -108,7 +108,7 @@ The screen also works in an ordinary browser at `http://127.0.0.1:47800/`. A ser
 
 1. Ask Claude to "open the iCtrl screen".
 2. Choose "USB" or "Wi-Fi" at the top of the screen to connect.
-3. When you are done, press "切断" (Disconnect) or close the screen.
+3. When you are done, press "Disconnect" or close the screen.
 
 | Action | How |
 |---|---|
@@ -124,6 +124,8 @@ The screen also works in an ordinary browser at `http://127.0.0.1:47800/`. A ser
 | Show or hide the screen | The iPhone-shaped button in the bottom bar |
 
 Unlock the iPhone yourself when it is locked.
+
+The screen is shown in English or Japanese, following the language of your PC (browser). To change it, choose one under "言語 / Language" in the menu.
 
 ## Ask Claude to operate the iPhone
 
@@ -151,7 +153,7 @@ The helper app is distributed unsigned. Sign it with your own Apple ID when you 
 
 With a free Apple ID, the helper app stops working after 7 days. Install it again with step 2 (AltStore Classic only needs a refresh).
 
-The first time the helper app starts, the iPhone may ask for its passcode. Enter it on the iPhone yourself, or set it up in iCtrl's menu, "WDA のパスコード入力" (Passcode for WDA).
+The first time the helper app starts, the iPhone may ask for its passcode. Enter it on the iPhone yourself, or set it up in iCtrl's menu, "Passcode entry for WDA".
 
 `iCtrl-WDA.ipa` is Appium's published WebDriverAgent build with only the app ID and the display name changed. The WebDriverAgent license (BSD-3-Clause) is `WebDriverAgent-LICENSE.txt` in the same release. Instead of downloading it, you can also ask Claude to "make the iCtrl helper app IPA": it builds the same file on the PC, on the desktop.
 
@@ -206,7 +208,7 @@ We recommend turning off "Allow Running When Locked" in the settings of ictrlcop
   - when Claude or Codex finishes, even if the iCtrl screen is open in its browser (not while you have the app window open);
   - after 5 minutes with no operation by a person or by the AI, even with the iCtrl screen open;
   - 30 seconds after the iCtrl screen is closed or hidden.
-- To keep the connection, turn on "使っていなくても接続を続ける（非推奨）" (keep the connection even when unused; not recommended) in the menu.
+- To keep the connection, turn on "Keep the connection even when unused (not recommended)" in the menu.
 - When there has been no connection and no open screen for 1 minute, iCtrl itself exits. It does not start with Windows.
 - iCtrl accepts requests only from inside the same PC.
 

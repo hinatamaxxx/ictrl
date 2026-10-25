@@ -82,6 +82,12 @@
         <label class="switch"><input type="checkbox" id="showImeButton"><span></span>下のバーに「A / あ」を表示</label>
         <label class="switch" title="オフ（おすすめ）のときは、AI が操作を終えたとき、人の操作も AI の操作もないまま 5 分たったとき、iCtrl の画面を閉じるか隠して 30 秒たったときに、iPhone との接続を切ります"><input type="checkbox" id="autoDisconnect"><span></span>使っていなくても接続を続ける（非推奨）</label>
         <p class="small">オフのときは、AI が操作を終えたとき、人も AI も操作しないまま 5 分たったとき、画面を閉じるか隠して 30 秒たったときに、iPhone との接続を自動で切ります。</p>
+        <label class="field-label" for="language">言語 / Language</label>
+        <select id="language">
+          <option value="auto">自動</option>
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+        </select>
         <dl class="facts" id="facts"></dl>
         <div id="pairingBox" hidden>
           <p class="small">iPhone の「ペアリング済みのコンピュータ」に iCtrl として表示されるよう、iCtrl 専用の「信頼」を作れます（iPhone で「信頼」とパスコード入力が一度必要。他のアプリの信頼はそのまま）。</p>
@@ -177,14 +183,14 @@
 <div class="modal" id="shortcutHelp" hidden>
   <div class="modal-card" role="dialog" aria-labelledby="shTitle">
     <h2 id="shTitle">iPhone にショートカットを追加してください</h2>
-    <p>iPhone でコピーした文字を PC にすぐ届けるには、iPhone のショートカット「<b>ictrlcopy</b>」が必要です。
+    <p data-i18n="shIntro">iPhone でコピーした文字を PC にすぐ届けるには、iPhone のショートカット「<b>ictrlcopy</b>」が必要です。
        見つからなかったか、反応しませんでした。</p>
     <ol>
-      <li>iPhone で <b>ショートカット</b> アプリを開き、下の <b>＋</b> → 右上の <b>編集</b></li>
-      <li>アクションを順に追加：<b>クリップボードを取得</b> → <b>入力からテキストを取得</b> → <b>if 文</b>（条件「テキスト」「任意の値」）</li>
-      <li><b>クリップボードにコピー</b> を if 文の「の場合」の中へ入れる（「その他の場合」には何も入れない）</li>
-      <li id="shKeyboardStep">キーボード接続方式では、<b>オートメーション</b> → <b>キーボード</b>（接続されたとき）を追加し、有効にする。<b>通知</b> はオフ</li>
-      <li>名前を <b>ictrlcopy</b> にして保存</li>
+      <li data-i18n="sh1">iPhone で <b>ショートカット</b> アプリを開き、下の <b>＋</b> → 右上の <b>編集</b></li>
+      <li data-i18n="sh2">アクションを順に追加：<b>クリップボードを取得</b> → <b>入力からテキストを取得</b> → <b>if 文</b>（条件「テキスト」「任意の値」）</li>
+      <li data-i18n="sh3"><b>クリップボードにコピー</b> を if 文の「の場合」の中へ入れる（「その他の場合」には何も入れない）</li>
+      <li id="shKeyboardStep" data-i18n="sh4">キーボード接続方式では、<b>オートメーション</b> → <b>キーボード</b>（接続されたとき）を追加し、有効にする。<b>通知</b> はオフ</li>
+      <li data-i18n="sh5">名前を <b>ictrlcopy</b> にして保存</li>
     </ol>
     <p class="small">AI（Claude / Codex）に「iCtrl のショートカットを作って」と頼むと、iCtrl 経由で代わりに作成することもできます。</p>
     <div class="row"><button class="btn primary grow" id="shTest">追加したので試す</button><button class="btn" id="shClose">閉じる</button></div>

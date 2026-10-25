@@ -1,4 +1,7 @@
 // iCtrl viewer: WebCodecs (hardware) HEVC decode, touch/keyboard input, controls.
+import { LANG, SETTING, adopt, t, translatePage } from "./i18n.js";
+
+translatePage();
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
 
@@ -87,10 +90,10 @@ function send(obj) {
 }
 
 const STAGES = {
-  ownership: "接続を準備中", usbmux: "USB の iPhone を探しています", bonjour: "Wi-Fi で iPhone を探しています", remote_pairing: "Wi-Fi で接続中", wifi_pairing: "Wi-Fi で使う準備中", lockdown: "iPhone に接続中", pairing: "iPhone で「このコンピュータを信頼」を押してください",
-  developer_mode: "デベロッパモードを確認中", developer_image: "iPhone の画面機能を準備中",
-  tunnel: "iPhone との通信を準備中", display_info: "画面の情報を取得中", display_stream: "画面の映像を開始中",
-  hid: "操作の準備中", ready: "準備完了",
+  ownership: t("接続を準備中"), usbmux: t("USB の iPhone を探しています"), bonjour: t("Wi-Fi で iPhone を探しています"), remote_pairing: t("Wi-Fi で接続中"), wifi_pairing: t("Wi-Fi で使う準備中"), lockdown: t("iPhone に接続中"), pairing: t("iPhone で「このコンピュータを信頼」を押してください"),
+  developer_mode: t("デベロッパモードを確認中"), developer_image: t("iPhone の画面機能を準備中"),
+  tunnel: t("iPhone との通信を準備中"), display_info: t("画面の情報を取得中"), display_stream: t("画面の映像を開始中"),
+  hid: t("操作の準備中"), ready: t("準備完了"),
 };
 
 // ------------------------------------------------------------------ status
@@ -114,7 +117,7 @@ const MODEL_NAMES = {
   "iPhone17,1": "iPhone 16 Pro", "iPhone17,2": "iPhone 16 Pro Max", "iPhone17,3": "iPhone 16", "iPhone17,4": "iPhone 16 Plus",
   "iPhone17,5": "iPhone 16e", "iPhone16,1": "iPhone 15 Pro", "iPhone16,2": "iPhone 15 Pro Max",
   "iPhone15,4": "iPhone 15", "iPhone15,5": "iPhone 15 Plus", "iPhone15,2": "iPhone 14 Pro", "iPhone15,3": "iPhone 14 Pro Max",
-  "iPhone14,7": "iPhone 14", "iPhone14,8": "iPhone 14 Plus", "iPhone14,6": "iPhone SE (第3世代)",
+  "iPhone14,7": "iPhone 14", "iPhone14,8": "iPhone 14 Plus", "iPhone14,6": t("iPhone SE (第3世代)"),
 };
 function modelName(id) { return MODEL_NAMES[id] || id || "iPhone"; }
 
@@ -156,12 +159,12 @@ function statusLabel(s) {
   // Over Wi-Fi the name is not known: show what is (the product, iOS).
   const device = s.name || [MODEL_NAMES[s.model] || "iPhone", s.ios && `iOS ${s.ios}`].filter(Boolean).join(" · ");
   return {
-    idle: "未接続", closed: "切断しました", closing: "切断中…",
+    idle: t("未接続"), closed: t("切断しました"), closing: t("切断中…"),
     // Short and fixed while connecting: the phone area shows the stage, and
     // a label that changed length per stage pushed the top bar's buttons out.
-    connecting: "接続中…",
+    connecting: t("接続中…"),
     ready: device,
-    failed: "接続が切れました",
+    failed: t("接続が切れました"),
   }[s.state] || s.state;
 }
 
@@ -188,7 +191,7 @@ function renderStatus() {
   const videoBtn = $("#videoBtn");
   videoBtn.hidden = !live;
   videoBtn.classList.toggle("off", !!paused);
-  videoBtn.title = paused ? "画面を映す" : "画面を映すのをやめる（操作・AI・スクリーンショットは続けて使えます）";
+  videoBtn.title = paused ? t("画面を映す") : t("画面を映すのをやめる（操作・AI・スクリーンショットは続けて使えます）");
   // While connecting, the top bar has 切断 and the phone area shows progress
   // only (no second set of connect buttons).
   $(".empty-actions").hidden = live || s.state === "connecting";
@@ -198,18 +201,18 @@ function renderStatus() {
   const err = $("#errorText");
   err.hidden = !s.error || live;
   err.textContent = s.error || "";
-  $("#emptyTitle").textContent = s.state === "failed" ? "接続が切れました" :
-    paused === "off" ? "画面を映していません" :
-    paused === "camera" ? "カメラの使用中は画面を映していません" :
-    paused ? "マイクかカメラの使用中は映像を出せません" :
-    live ? "映像を待っています…" : s.state === "connecting" ? "接続しています" : "iPhone を接続";
-  $("#emptyText").textContent = s.state === "failed" ? "原因を確認してから、もう一度接続してください。" :
-    paused === "off" ? "操作・AI・スクリーンショットはそのまま使えます。映すときは「画面を映す」を押してください。" :
-    paused === "camera" ? "iOS は、画面の映像を流している間はカメラを使わせません（カメラが真っ暗になります）。カメラを閉じると映像に戻ります。操作・AI・スクリーンショットはそのまま使えます。" :
-    paused ? "iOS は、通話や録音などでマイクかカメラを使っている間、画面の映像を出しません。操作・AI・スクリーンショットは使えます。WDA の起動に必要な XCTest 要求には、メニューで有効にした自動入力を使います。終わったら「画面を映す」を押してください。" :
-    live ? "画面が変化すると表示されます。" :
-    s.state === "connecting" ? `${s.transport === "wifi" ? "Wi-Fi" : "USB"} でつないでいます。` :
-    "USB ケーブルまたは同じ Wi-Fi で接続できます。";
+  $("#emptyTitle").textContent = s.state === "failed" ? t("接続が切れました") :
+    paused === "off" ? t("画面を映していません") :
+    paused === "camera" ? t("カメラの使用中は画面を映していません") :
+    paused ? t("マイクかカメラの使用中は映像を出せません") :
+    live ? t("映像を待っています…") : s.state === "connecting" ? t("接続しています") : t("iPhone を接続");
+  $("#emptyText").textContent = s.state === "failed" ? t("原因を確認してから、もう一度接続してください。") :
+    paused === "off" ? t("操作・AI・スクリーンショットはそのまま使えます。映すときは「画面を映す」を押してください。") :
+    paused === "camera" ? t("iOS は、画面の映像を流している間はカメラを使わせません（カメラが真っ暗になります）。カメラを閉じると映像に戻ります。操作・AI・スクリーンショットはそのまま使えます。") :
+    paused ? t("iOS は、通話や録音などでマイクかカメラを使っている間、画面の映像を出しません。操作・AI・スクリーンショットは使えます。WDA の起動に必要な XCTest 要求には、メニューで有効にした自動入力を使います。終わったら「画面を映す」を押してください。") :
+    live ? t("画面が変化すると表示されます。") :
+    s.state === "connecting" ? t("{via} でつないでいます。", { via: s.transport === "wifi" ? "Wi-Fi" : "USB" }) :
+    t("USB ケーブルまたは同じ Wi-Fi で接続できます。");
 
   const busy = live || s.state === "connecting";
   // Not connected: the phone area offers "USB で接続" / "Wi-Fi で接続", so the
@@ -220,21 +223,21 @@ function renderStatus() {
   // The dock's buttons act on a connected phone only.
   $("#dock").classList.toggle("idle", !live);
   const quick = $("#quickConnect");
-  quick.textContent = "切断";
+  quick.textContent = t("切断");
   quick.disabled = !busy;
   quick.className = "btn quick-connect " + (busy ? "danger" : "off");
   // While connected, the top bar shows the transport in use.
   if (busy && s.transport && s.transport !== state.transport) setTransport(s.transport);
 
   const watch = s.clipboard_watch || "";
-  $("#clipWatch").textContent = live ? (watch === "on" ? "監視中" : watch.startsWith("stopped") ? "監視停止" : "") : "";
+  $("#clipWatch").textContent = live ? (watch === "on" ? t("監視中") : watch.startsWith("stopped") ? t("監視停止") : "") : "";
   $("#clipWatch").title = watch;
   const facts = $("#facts");
   facts.innerHTML = "";
   if (live) {
-    const rows = [["端末", s.name], ["iOS", s.ios],
-      ["画面", s.screen ? `${s.screen[0]} × ${s.screen[1]}` : "—"],
-      ["映像", s.video?.codec ? "HEVC (GPU)" : "待機中"]];
+    const rows = [[t("端末"), s.name], ["iOS", s.ios],
+      [t("画面"), s.screen ? `${s.screen[0]} × ${s.screen[1]}` : "—"],
+      [t("映像"), s.video?.codec ? "HEVC (GPU)" : t("待機中")]];
     for (const [k, v] of rows) {
       facts.insertAdjacentHTML("beforeend", `<dt>${k}</dt><dd></dd>`);
       facts.lastElementChild.textContent = v || "—";
@@ -342,7 +345,7 @@ async function configure(cfg) {
   if (!config) {
     state.configuring = false;
     held.length = 0;
-    toast("この画面では HEVC の映像を再生できません（GPU で HEVC を再生できるブラウザーが必要です）", true);
+    toast(t("この画面では HEVC の映像を再生できません（GPU で HEVC を再生できるブラウザーが必要です）"), true);
     renderStatus();
     return;
   }
@@ -447,7 +450,7 @@ function connectSocket() {
       renderStatus();
       renderPasscode();
       if (passcodeChanged) refreshPasscode();
-      if (prev !== msg.state && msg.state === "failed") toast(msg.error || "接続が切れました", true);
+      if (prev !== msg.state && msg.state === "failed") toast(msg.error || t("接続が切れました"), true);
       // The server keeps one PC-keyboard setting for every open window: only
       // the window the user works in states it. Every window sending its own
       // made a background one (keyboard off) switch the iPhone to its
@@ -490,6 +493,7 @@ function connectSocket() {
       applyClipboardSettings(msg);
       applyWdaMode(msg);
       applyVideoOnConnect(msg);
+      applyLanguage(msg);
     } else if (msg.t === "passcode") {
       refreshPasscode();
     } else if (msg.t === "agent") {
@@ -508,7 +512,7 @@ function connectSocket() {
     // is our own process on this PC, not the phone; the phone session is
     // never reopened automatically).
     state.ws = null;
-    state.status = { state: "idle", error: "iCtrl サーバーに再接続しています…" };
+    state.status = { state: "idle", error: t("iCtrl サーバーに再接続しています…") };
     renderStatus();
     setTimeout(connectSocket, 1000);
   };
@@ -660,7 +664,7 @@ function tapAt(p, holdMs = 50) {
   setTimeout(() => { send({ t: "touch", phase: "up", ...p }); fade(d); }, holdMs);
 }
 async function copyScreenToPc() {
-  try { await api("/api/screenshot/copy", {}); toast("iPhone の画面を PC にコピーしました"); }
+  try { await api("/api/screenshot/copy", {}); toast(t("iPhone の画面を PC にコピーしました")); }
   catch (e) { toast(e.message, true); }
 }
 const CTX = {
@@ -815,8 +819,8 @@ function renderKbd() {
   $("#kbdBtn").classList.toggle("on", state.kbd);
   device.classList.toggle("kbd", state.kbd);
   const chip = $("#imeBtn");
-  chip.textContent = state.jp ? "あ" : "A";
-  chip.title = (state.jp ? "日本語入力" : "英字入力") + "（クリック / 半角全角キーで切替。Windows と iPhone の両方が切り替わります）";
+  chip.textContent = state.jp ? t("あ") : "A";
+  chip.title = (state.jp ? t("日本語入力") : t("英字入力")) + t("（クリック / 半角全角キーで切替。Windows と iPhone の両方が切り替わります）");
 }
 
 function syncKeys() { send({ t: "keys", usages: [...state.keysDown] }); }
@@ -829,7 +833,7 @@ function setKbd(on, announce = true) {
   if (!on) { state.keysDown.clear(); syncKeys(); releaseKeyboard(); }
   else focusKeyboard();
   renderKbd();
-  if (announce) toast(on ? "PC キーボードを iPhone に接続しました（Ctrl+K で解除）" : "キーボードの接続を解除しました");
+  if (announce) toast(on ? t("PC キーボードを iPhone に接続しました（Ctrl+K で解除）") : t("キーボードの接続を解除しました"));
 }
 
 // The iPhone's かな / 英数 follows the Windows IME on the server (manager.
@@ -902,7 +906,7 @@ async function pasteFromPc() {
     const r = await api("/api/clipboard/push", {});
     if (!r.ok) return toast(r.error, true);
     command({ t: "key", key: "v", modifiers: ["cmd"] });
-  } catch (e) { toast("貼り付けできませんでした: " + e.message, true); }
+  } catch (e) { toast(t("貼り付けできませんでした: ") + e.message, true); }
 }
 
 async function copyToPc() {
@@ -1008,15 +1012,15 @@ function command(obj) {
   return new Promise((resolve) => pendingReplies.set(id, resolve));
 }
 function pressButton(name) {
-  if (state.status.state !== "ready") return toast("先に iPhone に接続してください", true);
+  if (state.status.state !== "ready") return toast(t("先に iPhone に接続してください"), true);
   command({ t: "button", name });
 }
 
 $$("[data-button]").forEach((b) => b.addEventListener("click", () => pressButton(b.dataset.button)));
 $("#lockBtn").addEventListener("click", async () => {
-  if (state.status.state !== "ready") return toast("先に iPhone に接続してください", true);
+  if (state.status.state !== "ready") return toast(t("先に iPhone に接続してください"), true);
   const r = await command({ t: "lock" });
-  if (r && r.already_locked) toast("iPhone はすでにロックされています");
+  if (r && r.already_locked) toast(t("iPhone はすでにロックされています"));
 });
 $("#kbdBtn").addEventListener("click", () => setKbd(!state.kbd));
 $("#imeBtn").addEventListener("click", () => toggleWindowsIme());
@@ -1060,20 +1064,20 @@ $("#videoBtn").addEventListener("click", async () => {
   const paused = !!state.status.video_paused;
   try {
     await api(paused ? "/api/video/start" : "/api/video/stop", {});
-    toast(paused ? "画面を映しました" : "画面を映すのをやめました");
+    toast(paused ? t("画面を映しました") : t("画面を映すのをやめました"));
   } catch (e) { toast(e.message, true); }
 });
 $("#videoResume").addEventListener("click", async () => {
-  try { await api("/api/video/start", {}); toast("画面を映しました"); }
+  try { await api("/api/video/start", {}); toast(t("画面を映しました")); }
   catch (e) { toast(e.message, true); }
 });
 async function stopAutomation() {
-  try { await api("/api/automation/stop", {}); toast("iPhone の自動操作を終了しました"); }
+  try { await api("/api/automation/stop", {}); toast(t("iPhone の自動操作を終了しました")); }
   catch (e) { toast(e.message, true); }
 }
 $("#pairingBtn").addEventListener("click", async () => {
-  toast("iPhone で「このコンピュータを信頼」→ パスコードを入力してください");
-  try { await api("/api/pairing", {}); toast("iCtrl 専用の信頼を作成しました。次の接続から使います"); }
+  toast(t("iPhone で「このコンピュータを信頼」→ パスコードを入力してください"));
+  try { await api("/api/pairing", {}); toast(t("iCtrl 専用の信頼を作成しました。次の接続から使います")); }
   catch (e) { toast(e.message, true); }
 });
 $("#agentBadge").addEventListener("click", () => {
@@ -1107,7 +1111,7 @@ function renderPasscode() {
   const connected = state.status.state === "ready";
   const entering = connected && state.status.passcode_state === "entering";
   const canEnable = info.available && info.saved && connected && !info.error;
-  $("#passcodeState").textContent = !info.available ? "この環境では利用不可" : info.saved ? "保存済み" : "未保存";
+  $("#passcodeState").textContent = !info.available ? t("この環境では利用不可") : info.saved ? t("保存済み") : t("未保存");
   $("#passcodeEnter").hidden = !(info.available && info.saved && connected);
   $("#passcodeDelete").hidden = !(info.available && info.saved);
   $("#passcodeSaveRow").hidden = !(info.available && !info.saved);
@@ -1122,24 +1126,24 @@ function renderPasscode() {
   reset.disabled = state.passcodeBusy || !canEnable;
   const status = $("#passcodeAutomaticState");
   status.dataset.state = "";
-  if (info.error) status.textContent = "設定を取得できません。iCtrl サーバーとの接続を確認してください。";
-  else if (!info.saved) status.textContent = "先にパスコードを保存してください。自動入力は未設定です。";
-  else if (entering) status.textContent = "パスコードを入力しています。確認が終わるまで追加の入力はしません。";
+  if (info.error) status.textContent = t("設定を取得できません。iCtrl サーバーとの接続を確認してください。");
+  else if (!info.saved) status.textContent = t("先にパスコードを保存してください。自動入力は未設定です。");
+  else if (entering) status.textContent = t("パスコードを入力しています。確認が終わるまで追加の入力はしません。");
   else if (automatic.blocked) {
     status.dataset.state = "blocked";
-    status.textContent = "入力結果が未確認のため、自動入力は停止中です。iPhone の状態とパスコードを確認してから再有効化してください。";
+    status.textContent = t("入力結果が未確認のため、自動入力は停止中です。iPhone の状態とパスコードを確認してから再有効化してください。");
   } else if (!connected) status.textContent = automatic.enabled
-    ? "許可した iPhone の接続を待っています。自動入力はいつでもオフにできます。"
-    : "自動入力はオフです。有効にする iPhone を接続してください。";
+    ? t("許可した iPhone の接続を待っています。自動入力はいつでもオフにできます。")
+    : t("自動入力はオフです。有効にする iPhone を接続してください。");
   else if (automatic.enabled && !automatic.device_matches) {
     status.dataset.state = "blocked";
-    status.textContent = "接続中の iPhone は許可した端末と違うため、入力しません。この端末で使う場合は再有効化してください。";
+    status.textContent = t("接続中の iPhone は許可した端末と違うため、入力しません。この端末で使う場合は再有効化してください。");
   } else if (automatic.enabled) {
     status.dataset.state = "enabled";
-    status.textContent = "この iPhone で有効です。WDA 起動時の XCTest 要求に自動入力します。";
+    status.textContent = t("この iPhone で有効です。WDA 起動時の XCTest 要求に自動入力します。");
   } else status.textContent = info.available
-    ? "自動入力はオフです。オンにすると、WDA 起動時の XCTest 要求に自動入力します。"
-    : "この環境では Windows 資格情報マネージャーを利用できません。";
+    ? t("自動入力はオフです。オンにすると、WDA 起動時の XCTest 要求に自動入力します。")
+    : t("この環境では Windows 資格情報マネージャーを利用できません。");
 }
 // Serialise button actions locally; the server also refuses overlapping entry.
 async function passcodeAction(path, body) {
@@ -1156,33 +1160,33 @@ async function passcodeAction(path, body) {
 async function savePasscode(input) {
   const value = input.value;
   input.value = "";
-  if (await passcodeAction("/api/passcode/save", { passcode: value })) toast("パスコードを保存しました");
+  if (await passcodeAction("/api/passcode/save", { passcode: value })) toast(t("パスコードを保存しました"));
   refreshPasscode();
 }
 $("#passcodeSave").addEventListener("click", () => savePasscode($("#passcodeInput")));
 $("#passcodeDelete").addEventListener("click", async () => {
-  if (await passcodeAction("/api/passcode/delete", {})) toast("削除しました");
+  if (await passcodeAction("/api/passcode/delete", {})) toast(t("削除しました"));
   refreshPasscode();
 });
 async function configureAutomatic(enabled) {
   if (state.passcodeBusy) return;
   const ok = await passcodeAction("/api/passcode/automatic", { enabled });
   await refreshPasscode();
-  if (ok) toast(enabled ? "この iPhone の XCTest 自動入力を有効にしました" : "自動入力をオフにしました");
+  if (ok) toast(enabled ? t("この iPhone の XCTest 自動入力を有効にしました") : t("自動入力をオフにしました"));
 }
 $("#passcodeAutomatic").addEventListener("change", (event) => configureAutomatic(event.target.checked));
 $("#passcodeAutomaticReset").addEventListener("click", () => configureAutomatic(true));
 async function enterPasscode() {
   if (state.passcodeBusy) return;
-  if (state.status.state !== "ready") return toast("先に iPhone に接続してください", true);
-  if (!state.passcode.saved) return toast("先にパスコードを保存してください", true);
-  if (await passcodeAction("/api/passcode/enter", {})) toast("パスコードを入力しました");
+  if (state.status.state !== "ready") return toast(t("先に iPhone に接続してください"), true);
+  if (!state.passcode.saved) return toast(t("先にパスコードを保存してください"), true);
+  if (await passcodeAction("/api/passcode/enter", {})) toast(t("パスコードを入力しました"));
 }
 $("#passcodeEnter").addEventListener("click", enterPasscode);
 refreshPasscode();
 
 async function saveShot() {
-  if (state.status.state !== "ready") return toast("先に iPhone に接続してください", true);
+  if (state.status.state !== "ready") return toast(t("先に iPhone に接続してください"), true);
   if (saveShot.busy) return;
   saveShot.busy = true;
   try {
@@ -1193,10 +1197,10 @@ async function saveShot() {
     Object.assign(flash.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`,
                                  borderRadius: getComputedStyle(device).borderRadius });
     flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go");
-    toast("スクリーンショットを保存しました", false, {
-      label: "フォルダーを開く",
+    toast(t("スクリーンショットを保存しました"), false, {
+      label: t("フォルダーを開く"),
       image: `/api/screenshot/last?name=${encodeURIComponent(saved.name)}`,
-      detail: `${saved.name} · ${saved.folder.split("\\").pop()}${saved.copied ? " · コピー済み" : ""}`,
+      detail: `${saved.name} · ${saved.folder.split("\\").pop()}${saved.copied ? t(" · コピー済み") : ""}`,
       run: () => api("/api/screenshot/reveal", {}).catch((e) => toast(e.message, true)),
     });
   } catch (e) { toast(e.message, true); }
@@ -1212,13 +1216,13 @@ function renderShotFolder(info) {
 }
 async function loadShotFolder() {
   try { renderShotFolder(await api("/api/screenshot/folder")); }
-  catch (e) { $("#shotFolder").textContent = "取得できませんでした"; }
+  catch (e) { $("#shotFolder").textContent = t("取得できませんでした"); }
 }
 async function changeShotFolder(action) {
   try {
     const info = await api("/api/screenshot/folder", { action });
     renderShotFolder(info);
-    if (!info.cancelled) toast(action === "reset" ? "保存先を既定に戻しました" : "保存先を変更しました");
+    if (!info.cancelled) toast(action === "reset" ? t("保存先を既定に戻しました") : t("保存先を変更しました"));
   } catch (e) { toast(e.message, true); }
 }
 $("#shotFolderPick").addEventListener("click", () => changeShotFolder("pick"));
@@ -1293,7 +1297,7 @@ async function loadDevices() {
   try {
     const { devices } = await api("/api/devices");
     state.devices = devices;
-    sel.innerHTML = devices.length ? "" : `<option value="">iPhone が見つかりません</option>`;
+    sel.innerHTML = devices.length ? "" : `<option value="">${t("iPhone が見つかりません")}</option>`;
     for (const d of devices) {
       const o = document.createElement("option");
       o.value = d.udid;
@@ -1303,7 +1307,7 @@ async function loadDevices() {
     }
     if (devices[0] && !devices[0].transports.includes(state.transport)) setTransport(devices[0].transports[0]);
   } catch (e) {
-    sel.innerHTML = `<option value="">取得できません</option>`;
+    sel.innerHTML = `<option value="">${t("取得できません")}</option>`;
     toast(e.message, true);
   }
 }
@@ -1331,25 +1335,25 @@ function clipRow(item, fresh = false) {
   const li = document.createElement("li");
   li.dataset.id = item.id;
   if (fresh) li.classList.add("fresh");
-  const when = new Date(item.time * 1000).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+  const when = new Date(item.time * 1000).toLocaleTimeString(LANG === "en" ? "en-US" : "ja-JP", { hour: "2-digit", minute: "2-digit" });
   li.innerHTML = `<span class="src"></span><div class="body"></div><div class="act">
-    <button data-a="to-pc" title="PC にコピー">PC</button><button data-a="to-iphone" title="iPhone にコピー">📱</button></div>`;
+    <button data-a="to-pc" title="${t("PC にコピー")}">PC</button><button data-a="to-iphone" title="${t("iPhone にコピー")}">📱</button></div>`;
   li.querySelector(".src").textContent = item.source === "iphone" ? "📱→" : "PC→";
   const body = li.querySelector(".body");
   if (item.kind === "image") {
     body.innerHTML = `<img alt=""><div class="m"></div>`;
     body.querySelector("img").src = item.thumb;
-    body.querySelector(".m").textContent = `画像 ${item.width}×${item.height} · ${when}`;
+    body.querySelector(".m").textContent = `${t("画像")} ${item.width}×${item.height} · ${when}`;
   } else {
     body.innerHTML = `<div class="t"></div><div class="m"></div>`;
     body.querySelector(".t").textContent = item.text;
-    body.querySelector(".m").textContent = `${item.chars} 文字 · ${when}`;
+    body.querySelector(".m").textContent = t("{n} 文字", { n: item.chars }) + ` · ${when}`;
   }
   li.addEventListener("click", async (ev) => {
     const action = ev.target.dataset.a || "to-pc";
     try {
       await api(`/api/clipboard/item/${item.id}/${action}`, {});
-      toast(action === "to-pc" ? "PC にコピーしました" : "iPhone にコピーしました");
+      toast(action === "to-pc" ? t("PC にコピーしました") : t("iPhone にコピーしました"));
     } catch (e) { toast(e.message, true); }
   });
   return li;
@@ -1371,16 +1375,16 @@ async function loadClips() {
 function onClipboardEvent(msg) {
   addClip(msg.item, true);
   if (msg.item.source === "iphone") {
-    const what = msg.item.kind === "image" ? "画像" : "テキスト";
-    if (msg.copied_to_pc) toast("コピーしました");
+    const what = msg.item.kind === "image" ? t("画像") : t("テキスト");
+    if (msg.copied_to_pc) toast(t("コピーしました"));
   } else if (msg.to_iphone) {
-    toast("iPhone にコピーしました");
+    toast(t("iPhone にコピーしました"));
   }
 }
 // WebDriverAgent mode: on demand / off (OCR only).
 const WDA_MODE_HELP = {
-  on_demand: "AI が要素を読むときに起動し、作業が終わると止めます。起動のたびに iPhone がパスコードを求めることがあります。",
-  off: "WebDriverAgent を使わず、画面の文字を Windows の文字認識で読みます。パスコード要求は出ませんが、遅く、文字のないアイコンは読めません。",
+  on_demand: t("AI が要素を読むときに起動し、作業が終わると止めます。起動のたびに iPhone がパスコードを求めることがあります。"),
+  off: t("WebDriverAgent を使わず、画面の文字を Windows の文字認識で読みます。パスコード要求は出ませんが、遅く、文字のないアイコンは読めません。"),
 };
 function applyWdaMode(settings) {
   if (!("wda_mode" in settings) && settings.t === "settings") return;
@@ -1428,6 +1432,20 @@ $("#autoDisconnect").addEventListener("change", async (ev) => {
 });
 api("/api/settings").then(applyAutoDisconnect).catch(() => {});
 
+// Display language (i18n.js): "auto" follows the browser. A change, here or
+// in another window, redraws the page in the new language.
+$("#language").value = SETTING;
+function applyLanguage(settings) {
+  if (!("language" in settings)) return;
+  $("#language").value = settings.language;
+  if (adopt(settings.language)) { send({ t: "reloading" }); location.reload(); }
+}
+$("#language").addEventListener("change", async (ev) => {
+  try { applyLanguage(await api("/api/settings", { language: ev.target.value })); }
+  catch (e) { toast(e.message, true); }
+});
+api("/api/settings").then(applyLanguage).catch(() => {});
+
 $("#autoCopy").addEventListener("change", async (ev) => {
   try { await api("/api/settings", { auto_copy_to_pc: ev.target.checked }); }
   catch (e) { toast(e.message, true); }
@@ -1436,7 +1454,7 @@ $("#clipPull").addEventListener("click", async () => {
   try {
     const r = await api("/api/clipboard/pull", {});
     if (!r.ok) return toast(r.error, true);
-    toast(r.image ? "iPhone の画像を PC にコピーしました" : "iPhone のテキストを PC にコピーしました");
+    toast(r.image ? t("iPhone の画像を PC にコピーしました") : t("iPhone のテキストを PC にコピーしました"));
   } catch (e) { toast(e.message, true); }
 });
 
@@ -1444,11 +1462,11 @@ $("#shClose").addEventListener("click", () => { $("#shortcutHelp").hidden = true
 // After adding the shortcut: run ictrlcopy once (keyboard connection).
 $("#shTest").addEventListener("click", async () => {
   $("#shortcutHelp").hidden = true;
-  if (state.status.state !== "ready") return toast("先に iPhone に接続してください", true);
+  if (state.status.state !== "ready") return toast(t("先に iPhone に接続してください"), true);
   try {
     const r = await api("/api/clipboard/plain", {});
-    if (r.ok === false) throw new Error(r.error || "ショートカットを呼び出せませんでした");
-    toast("ictrlcopy の実行を要求しました。iPhone の表示とコピー結果を確認してください");
+    if (r.ok === false) throw new Error(r.error || t("ショートカットを呼び出せませんでした"));
+    toast(t("ictrlcopy の実行を要求しました。iPhone の表示とコピー結果を確認してください"));
   } catch (e) { toast(e.message, true); }
 });
 
@@ -1457,15 +1475,15 @@ function renderApps() {
   const q = $("#appSearch").value.trim().toLowerCase();
   const list = $("#apps");
   const apps = state.apps.filter((a) => !q || a.name.toLowerCase().includes(q) || a.bundle_id.toLowerCase().includes(q));
-  list.innerHTML = apps.length ? "" : `<li class="muted">${state.apps.length ? "該当なし" : "接続後に「読み込む」"}</li>`;
+  list.innerHTML = apps.length ? "" : `<li class="muted">${state.apps.length ? t("該当なし") : t("接続後に「読み込む」")}</li>`;
   for (const a of apps.slice(0, 300)) {
     const li = document.createElement("li");
     li.innerHTML = `<span class="n"></span><span class="b"></span>`;
     li.querySelector(".n").textContent = a.name;
     li.querySelector(".b").textContent = a.bundle_id;
-    li.title = "クリックで起動";
+    li.title = t("クリックで起動");
     li.addEventListener("click", async () => {
-      try { await api("/api/launch", { bundle_id: a.bundle_id }); toast(`${a.name} を起動しました`); }
+      try { await api("/api/launch", { bundle_id: a.bundle_id }); toast(t("{name} を起動しました", { name: a.name })); }
       catch (e) { toast(e.message, true); }
     });
     list.appendChild(li);
@@ -1474,10 +1492,10 @@ function renderApps() {
 $("#appSearch").addEventListener("input", renderApps);
 $("#loadApps").addEventListener("click", async () => {
   const btn = $("#loadApps");
-  btn.textContent = "読み込み中…";
+  btn.textContent = t("読み込み中…");
   try { state.apps = (await api("/api/apps")).apps; renderApps(); }
   catch (e) { toast(e.message, true); }
-  finally { btn.textContent = "再読み込み"; }
+  finally { btn.textContent = t("再読み込み"); }
 });
 
 // MCP setup snippets
@@ -1487,8 +1505,8 @@ $$("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
     ? `claude mcp add --scope user ictrl -- "${python}" -m ictrl mcp`
     : `[mcp_servers.ictrl]\ncommand = ${JSON.stringify(python)}\nargs = ["-m", "ictrl", "mcp"]\ncwd = ${JSON.stringify(root)}`;
   await navigator.clipboard.writeText(text);
-  toast(b.dataset.copy === "claude" ? "コマンドをコピーしました。ターミナルに貼り付けて実行してください"
-    : "~/.codex/config.toml に貼り付けてください");
+  toast(b.dataset.copy === "claude" ? t("コマンドをコピーしました。ターミナルに貼り付けて実行してください")
+    : t("~/.codex/config.toml に貼り付けてください"));
 }));
 
 // agent activity
@@ -1510,18 +1528,18 @@ function renderAgentBadge() {
   // worked without WebDriverAgent, or before it had started).
   badge.classList.add("can-stop");
   $("#agentStop").hidden = false;
-  if (automation) badge.title = "iPhone の UI 自動操作（Automation Running）が有効です。クリックで終了";
+  if (automation) badge.title = t("iPhone の UI 自動操作（Automation Running）が有効です。クリックで終了");
 }
 function showAgent(msg) {
-  const labels = { tap: "タップ", swipe: "スワイプ", button: "ボタン操作", text: "文字入力",
-    key: "キー入力", keys: "キー入力", touch: "タッチ操作", launch: "アプリを起動",
-    screenshot: "画面を確認", apps: "アプリ一覧を取得", clipboard: "クリップボードを操作",
-    connect: "接続を操作", elements: "画面の要素を確認" };
+  const labels = { tap: t("タップ"), swipe: t("スワイプ"), button: t("ボタン操作"), text: t("文字入力"),
+    key: t("キー入力"), keys: t("キー入力"), touch: t("タッチ操作"), launch: t("アプリを起動"),
+    screenshot: t("画面を確認"), apps: t("アプリ一覧を取得"), clipboard: t("クリップボードを操作"),
+    connect: t("接続を操作"), elements: t("画面の要素を確認") };
   // The server's count, not a tally of start/end notices: a page that reads
   // slowly (hidden) has its oldest notices dropped by the server's queue,
   // and a missed "end" kept the badge on after the agent had stopped.
   if (typeof msg.running === "number") agentState.running = msg.running;
-  if (msg.op) $("#agentBadge").title = "AI: " + (labels[msg.op] || "操作");
+  if (msg.op) $("#agentBadge").title = "AI: " + (labels[msg.op] || t("操作"));
   clearTimeout(agentState.timer);
   agentState.recent = true;
   if (!agentState.running) agentState.timer = setTimeout(() => { agentState.recent = false; renderAgentBadge(); }, 1500);
@@ -1552,7 +1570,7 @@ $("#menuBackdrop").addEventListener("pointerdown", (ev) => { ev.preventDefault()
 // boot
 // The app window is WebView2 (window/iCtrlWindow.cs); Chrome works too. The
 // video is HEVC decoded by WebCodecs on the GPU.
-if (typeof VideoDecoder === "undefined") toast("この画面では映像を再生できません（WebCodecs に対応したブラウザーが必要です）", true);
+if (typeof VideoDecoder === "undefined") toast(t("この画面では映像を再生できません（WebCodecs に対応したブラウザーが必要です）"), true);
 setTransport(state.transport);
 renderStatus();
 connectSocket();

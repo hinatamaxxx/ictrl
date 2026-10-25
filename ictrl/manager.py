@@ -38,6 +38,8 @@ def usbmux_listening() -> bool:
 # There is no resident mode: WDA has no authentication and listens on every
 # interface of the phone, so it never stays running between tasks.
 WDA_MODES = ("on_demand", "off")
+# The page's display language (ui/i18n.js): "auto" follows the browser.
+LANGUAGES = ("auto", "ja", "en")
 # Nobody is using the phone (no iCtrl window open, no agent working): the
 # connection (tunnel, screen stream, clipboard and log watches) is closed so
 # nothing keeps reaching the phone in the background.
@@ -77,7 +79,7 @@ class Manager:
         self.clips = ClipHistory()
         self._settings_path = DATA_DIR / "settings.json"
         self.settings = {"auto_copy_to_pc": True, "video_on_connect": True, "show_ime_button": False,
-                         "auto_disconnect": True,
+                         "auto_disconnect": True, "language": "auto",
                          "clipboard_shortcut_mode": "keyboard", **self._load_settings()}
         try:
             validate_clipboard_shortcut_mode(self.settings["clipboard_shortcut_mode"])
@@ -138,6 +140,10 @@ class Manager:
             if changes["wda_mode"] not in WDA_MODES:
                 raise ValueError(f"wda_mode must be one of {', '.join(WDA_MODES)}")
             updated["wda_mode"] = changes["wda_mode"]
+        if "language" in changes:
+            if changes["language"] not in LANGUAGES:
+                raise ValueError(f"language must be one of {', '.join(LANGUAGES)}")
+            updated["language"] = changes["language"]
         if "clipboard_shortcut_mode" in changes:
             updated["clipboard_shortcut_mode"] = changes["clipboard_shortcut_mode"]
         if "screenshot_dir" in changes:
