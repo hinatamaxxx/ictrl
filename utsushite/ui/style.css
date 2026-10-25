@@ -69,7 +69,7 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .brand { display: flex; align-items: center; font-weight: 650; font-size: 15px; letter-spacing: 0.2px; }
 /* The name narrows and fades out (and back) when a narrow top bar needs its room. */
 .brand span {
-  display: inline-block; overflow: hidden; white-space: nowrap; max-width: 4em; margin-left: 9px;
+  display: inline-block; overflow: hidden; white-space: nowrap; max-width: 6em; margin-left: 9px;
   transition: max-width 0.32s ease, margin-left 0.32s ease, opacity 0.22s ease;
 }
 @media (prefers-reduced-motion: reduce) { .brand span { transition: none; } }
