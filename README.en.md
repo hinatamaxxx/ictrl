@@ -2,7 +2,7 @@
 
 [日本語](README.md) | English
 
-iCtrl shows your iPhone's screen on a Windows PC and lets you use it with the mouse and keyboard, over a USB cable or the same Wi-Fi network. You can also ask Claude, the AI assistant, to operate the iPhone for you ("open Settings on the iPhone").
+iCtrl lets the AI on your PC (such as Claude) operate your iPhone. Ask Claude something like "open Settings on the iPhone" and Claude does it. The iPhone's screen is shown on the PC, so you can watch and also use the iPhone yourself with the mouse and keyboard, over a USB cable or the same Wi-Fi network.
 
 ## What it does
 
@@ -17,18 +17,14 @@ iCtrl shows your iPhone's screen on a Windows PC and lets you use it with the mo
 | Item | Notes |
 |---|---|
 | A Windows 10 or 11 PC | Macs are not supported |
-| The Claude desktop app | Needed to use iCtrl as a Claude plugin, from Claude Code (the app's "Code" tab) |
+| The Claude desktop app | iCtrl is installed as a Claude plugin and used from Claude Code (the app's "Code" tab) |
 | The Apple Devices app | Needed to connect the iPhone over USB. Free from the [Microsoft Store](https://apps.microsoft.com/detail/9np83lwlpz9k) (not needed if iTunes is installed) |
 | An iPhone | iOS 17.4 or later, with **Developer Mode** on (Settings › Privacy & Security › Developer Mode; the iPhone restarts when you turn it on) |
 | A USB cable | Only for the first connection. After that, Wi-Fi works too |
 
-As a Claude plugin, you do not need to install Python or anything else yourself: the first time iCtrl starts, it downloads what it needs (about 200 MB, some 20 seconds). As a standalone app, it needs Python 3.13 or later (see [Install as an app](#install-as-an-app-without-claude)).
+You do not need to install Python or anything else yourself: the first time iCtrl starts, it downloads what it needs (about 200 MB, some 20 seconds).
 
 ## Install
-
-There are two ways. To let Claude operate the iPhone too, install iCtrl as a Claude plugin (recommended). You can also use iCtrl alone as an app, without Claude.
-
-### Install as a Claude plugin (recommended)
 
 1. Open the Claude desktop app and start a new session in the "Code" tab.
 2. Ask:
@@ -52,30 +48,9 @@ There are two ways. To let Claude operate the iPhone too, install iCtrl as a Cla
 
 While this repository is private, the plugin installs only on PCs signed in to a GitHub account that can see it.
 
-### Install as an app (without Claude)
+### Use it as an app, without Claude
 
-This installs iCtrl as an ordinary Windows app that you open from the Start menu. Its screen opens in its own window. The first time only, prepare three things.
-
-1. **Install Python.** iCtrl runs on Python, so install it first.
-   1. On [python.org's download page](https://www.python.org/downloads/), press "Download Python" to get the installer.
-   2. Open the installer, check "Add python.exe to PATH" at the bottom of the first screen, then press "Install Now".
-   3. The Microsoft Store Python does not work (settings and pairing records would end up in a separate place).
-2. **Download iCtrl.**
-   1. On this repository's page, press the green "Code" button and choose "Download ZIP".
-   2. Right-click the downloaded ZIP and choose "Extract All".
-   3. Put the extracted folder somewhere it can stay, for example in Documents, and name it `iCtrl`. The program runs from there, so do not move it later.
-3. **Set it up.**
-   1. Open the `iCtrl` folder in File Explorer.
-   2. Click the address bar (where the folder's location is shown), type `powershell` and press Enter. A dark window (PowerShell) opens.
-   3. Paste this line and press Enter. It downloads what it needs, which takes a few minutes. It is done when it shows "OK: iCtrl をインストールしました".
-
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File setup.ps1 -Shortcut
-   ```
-
-This adds "iCtrl" to the Start menu. See [Start and stop](#start-and-stop) for how to open it.
-
-Add ` -Desktop` to the end of the line in step 3 for a desktop icon, or ` -Codex` to operate the iPhone from Codex. Or give an AI agent this repository's URL and ask it to install iCtrl: it follows [AGENTS.md](AGENTS.md). Details are in [the technical notes, "セットアップ"](docs/technical.md#セットアップclaude-のプラグインを使わない場合) (Japanese).
+iCtrl also runs as an ordinary Windows app without Claude (opened from the Start menu, in its own window; it needs Python). To use it that way, give an AI agent such as Claude Code or Codex this repository's URL and ask it to "install it as an app": it follows [AGENTS.md](AGENTS.md). Ask the same way to operate the iPhone from Codex.
 
 ## Connect the iPhone for the first time
 
@@ -90,48 +65,26 @@ This also prepares the Wi-Fi connection. From then on, if the PC and the iPhone 
 
 iCtrl is made of a part that runs in the background (the server) and the screen that shows and controls the iPhone. You never need to start or stop the server yourself.
 
-| Used as | Start | Stop |
-|---|---|---|
-| Claude plugin | Ask Claude to "open the iCtrl screen", or to do something on the iPhone: the server starts on its own. The screen appears in the browser on the right side of the Claude app | It ends on its own once the screen is closed and Claude no longer uses iCtrl |
-| App | Open "iCtrl" from the Start menu: the server starts on its own and the iCtrl window opens | Closing the window closes the iPhone connection and ends it at once. If Claude or another AI is still using iCtrl, or another screen (such as Claude's browser) is open, it keeps running until that use ends |
+- **Start**: ask Claude to "open the iCtrl screen", or to do something on the iPhone: the server starts on its own. The screen appears in the browser on the right side of the Claude app.
+- **Stop**: 30 seconds after the screen is closed, the iPhone connection closes, and the server exits 1 minute later. The short wait keeps a screen that was only hidden for a moment from losing its connection. While Claude uses iCtrl, it keeps running.
 
-With the plugin, the iPhone connection closes 30 seconds after the screen is closed, and the server exits 1 minute later; the short wait keeps a screen that was only hidden for a moment from losing its connection. Either way, the server exits by itself after 1 minute with no screen, no iPhone connection and no AI at work. While only the server runs, no icon appears on the taskbar or in the notification area.
+While only the server runs, no icon appears on the taskbar or in the notification area. Installed as an app, iCtrl starts from "iCtrl" in the Start menu and ends as soon as you close its window.
 
 ### Start the server by hand (for advanced users)
 
-You do not normally need this, but the server can be started with a command. Open PowerShell in the iCtrl folder and run one of these.
-
-Installed as an app:
-
-- Start only the server in the background and print the screen's URL (`http://127.0.0.1:47800/`)
-
-  ```powershell
-  .venv\Scripts\python.exe -m ictrl url
-  ```
-
-- Run the server in the foreground (its log appears there; Ctrl+C stops it)
-
-  ```powershell
-  .venv\Scripts\python.exe -m ictrl serve
-  ```
-
-- Start the server and open the iCtrl window (the same as "iCtrl" in the Start menu)
-
-  ```powershell
-  .\iCtrl.cmd
-  ```
-
-Installed as a Claude plugin, use the entry point in the plugin folder. Replace `<version>` with the newest version folder's name in `%USERPROFILE%\.claude\plugins\cache\ictrl\ictrl\`.
+You do not normally need this, but the server can be started with a command. Run this in PowerShell, replacing `<version>` with the newest version folder's name in `%USERPROFILE%\.claude\plugins\cache\ictrl\ictrl\`.
 
 ```powershell
 & "$env:USERPROFILE\.claude\plugins\cache\ictrl\ictrl\<version>\plugin\ictrl.cmd" url
 ```
 
-The screen also works in an ordinary browser at `http://127.0.0.1:47800/`. A server started by hand also exits by itself after 1 minute unused. There is no command to stop it: stop a foreground server with Ctrl+C; otherwise wait for it to exit, or end `pythonw.exe` in Task Manager.
+The server starts in the background and prints the screen's URL (`http://127.0.0.1:47800/`). The commands for an app installation are in [the technical notes, "セットアップ"](docs/technical.md#セットアップclaude-のプラグインを使わない場合) (Japanese).
+
+The screen also works in an ordinary browser at `http://127.0.0.1:47800/`. A server started by hand also exits by itself after 1 minute unused. There is no command to stop it: wait for it to exit, or end `pythonw.exe` in Task Manager.
 
 ## Everyday use
 
-1. Open the iCtrl screen (see [Start and stop](#start-and-stop)).
+1. Ask Claude to "open the iCtrl screen".
 2. Choose "USB" or "Wi-Fi" at the top of the screen to connect.
 3. When you are done, press "切断" (Disconnect) or close the screen.
 
@@ -246,15 +199,10 @@ The log is at `%LOCALAPPDATA%\iCtrl\logs\ictrl.log`.
 
 ## Update and remove
 
-### As a Claude plugin
-
 - **Update:** ask Claude to "update the iCtrl plugin", then restart the Claude app.
 - **Remove:** ask Claude to "remove the iCtrl plugin". Settings and pairing records stay on the PC. To remove everything, delete the two folders `%APPDATA%\iCtrl` and `%LOCALAPPDATA%\iCtrl`.
 
-### As an app
-
-- **Update:** extract a new ZIP over the same folder, then do step 3 of the setup again.
-- **Remove:** uninstall iCtrl in Windows Settings › Apps › Installed apps. It first asks whether to keep settings and data. The extracted folder stays; delete it if you no longer need it.
+For an app installation, ask an AI agent to update or remove it.
 
 ## More details
 

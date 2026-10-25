@@ -55,7 +55,11 @@ powershell -ExecutionPolicy Bypass -File setup.ps1 -Shortcut
 - Wi-Fi で見えない: 一度 USB で接続したか（Wi-Fi 用のペアリングが自動で作られる）。PC と iPhone が同じネットワークか。
 - 依存関係のインストールに失敗: ネットワーク（PyPI に届くか）と Python の版（3.13 以上、python.org 版）を確かめて `setup.ps1` をやり直す。
 
-## 6. アンインストール
+## 6. 更新
+
+取得したフォルダーで `git pull` してから、`powershell -ExecutionPolicy Bypass -File setup.ps1` をもう一度実行する（前回と同じオプションを付ける）。iCtrl のサーバーが動いていたら、利用者にウィンドウを閉じてもらってから行う。
+
+## 7. アンインストール
 
 「設定 → アプリ → インストールされているアプリ」の iCtrl、または
 
