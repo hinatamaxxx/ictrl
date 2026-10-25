@@ -165,14 +165,15 @@ def create_app(port: int) -> Starlette:
             tracked = is_agent and path not in passive
             if tracked:
                 manager.agent_started()
-                manager.notify({"t": "agent", "phase": "start", "op": agent_labels.get(
+                manager.notify({"t": "agent", "phase": "start", "running": manager.agent_running,
+                                "op": agent_labels.get(
                     path, "clipboard" if path.startswith("/api/clipboard") else path.rsplit("/", 1)[-1])})
             try:
                 return await run_handler(request, handler)
             finally:
                 if tracked:
-                    manager.notify({"t": "agent", "phase": "end"})
                     manager.agent_ended()
+                    manager.notify({"t": "agent", "phase": "end", "running": manager.agent_running})
                     if path == "/api/automation/stop":
                         manager.agent_finished()    # ictrl_finish / the Stop hook
         return endpoint

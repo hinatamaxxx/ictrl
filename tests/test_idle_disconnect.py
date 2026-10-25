@@ -79,6 +79,38 @@ class IdleDisconnectTests(unittest.IsolatedAsyncioTestCase):
             await asyncio.sleep(0.05)
         self.assertEqual(ended, [])
 
+    def with_automation(self, m):
+        stop = mock.AsyncMock()
+        m.session = types.SimpleNamespace(info=types.SimpleNamespace(state="ready", automation=True),
+                                          ready=True, wda=lambda: types.SimpleNamespace(stop=stop))
+        return stop
+
+    async def test_an_interrupted_agent_leaves_no_automation_running(self):
+        m = self.make()
+        stop = self.with_automation(m)
+        with mock.patch.object(manager_module, "IDLE_AFTER_AGENT", 0.01):
+            m.window_opened()                         # the window keeps the connection
+            m.agent_started(); m.agent_ended()        # no ictrl_finish, no Stop hook
+            await asyncio.sleep(0.05)
+        stop.assert_awaited_once()
+        m.disconnect.assert_not_awaited()
+
+    async def test_a_working_agent_keeps_its_automation(self):
+        m = self.make()
+        stop = self.with_automation(m)
+        with mock.patch.object(manager_module, "IDLE_AFTER_AGENT", 0.05):
+            m.window_opened()
+            m.agent_started(); m.agent_ended()
+            m.agent_started()                         # the next request
+            await asyncio.sleep(0.1)
+        stop.assert_not_awaited()
+
+    async def test_status_carries_the_agent_count(self):
+        m = self.make()
+        m.session = None
+        m.agent_started()
+        self.assertEqual(m.status()["agent_running"], 1)
+
     async def test_the_setting_turns_it_off(self):
         m = self.make()
         m.settings["auto_disconnect"] = False

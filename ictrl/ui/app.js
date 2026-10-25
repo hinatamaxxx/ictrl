@@ -443,6 +443,7 @@ function connectSocket() {
       const passcodeChanged = prev !== msg.state || state.status.udid !== msg.udid ||
         state.status.passcode_state !== msg.passcode_state;
       state.status = msg;
+      if (typeof msg.agent_running === "number") agentState.running = msg.agent_running;
       renderStatus();
       renderPasscode();
       if (passcodeChanged) refreshPasscode();
@@ -1400,10 +1401,10 @@ $("#videoOnConnect").addEventListener("change", async (ev) => {
 });
 api("/api/settings").then(applyVideoOnConnect).catch(() => {});
 
-// The dock's A / あ (switches the Windows IME): shown unless turned off.
+// The dock's A / あ (switches the Windows IME): shown only when turned on.
 function applyShowImeButton(settings) {
   if (!("show_ime_button" in settings)) return;
-  const show = settings.show_ime_button !== false;
+  const show = settings.show_ime_button === true;
   $("#showImeButton").checked = show;
   $("#imeBtn").hidden = !show;
 }
@@ -1512,8 +1513,10 @@ function showAgent(msg) {
     key: "キー入力", keys: "キー入力", touch: "タッチ操作", launch: "アプリを起動",
     screenshot: "画面を確認", apps: "アプリ一覧を取得", clipboard: "クリップボードを操作",
     connect: "接続を操作", elements: "画面の要素を確認" };
-  if (msg.phase === "end") agentState.running = Math.max(0, agentState.running - 1);
-  else if (msg.phase === "start") agentState.running += 1;
+  // The server's count, not a tally of start/end notices: a page that reads
+  // slowly (hidden) has its oldest notices dropped by the server's queue,
+  // and a missed "end" kept the badge on after the agent had stopped.
+  if (typeof msg.running === "number") agentState.running = msg.running;
   if (msg.op) $("#agentBadge").title = "AI: " + (labels[msg.op] || "操作");
   clearTimeout(agentState.timer);
   agentState.recent = true;

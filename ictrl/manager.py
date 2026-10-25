@@ -62,6 +62,7 @@ class Manager:
         self.windows = 0                     # iCtrl windows (pages) connected
         self.agent_running = 0               # agent requests in progress
         self._idle_task: Optional[asyncio.Task] = None
+        self._automation_task: Optional[asyncio.Task] = None
         self.pages = 0                       # iCtrl pages connected, shown or hidden
         self._exit_task: Optional[asyncio.Task] = None
         self.on_unused = None                # set by the server: ends the process
@@ -70,7 +71,7 @@ class Manager:
         from .clipboard import ClipHistory
         self.clips = ClipHistory()
         self._settings_path = DATA_DIR / "settings.json"
-        self.settings = {"auto_copy_to_pc": True, "video_on_connect": True, "show_ime_button": True,
+        self.settings = {"auto_copy_to_pc": True, "video_on_connect": True, "show_ime_button": False,
                          "auto_disconnect": True,
                          "clipboard_shortcut_mode": "keyboard", **self._load_settings()}
         try:
@@ -271,7 +272,8 @@ class Manager:
     def status(self) -> dict:
         s = self.session
         if s is None:
-            return {"t": "status", "state": "idle", "windows_ime": self.windows_ime}
+            return {"t": "status", "state": "idle", "windows_ime": self.windows_ime,
+                    "agent_running": self.agent_running}
         info = asdict(s.info)
         hub = s.hub
         info.update({
@@ -286,6 +288,7 @@ class Manager:
             "keyboard": s.keyboard_id is not None,
             "rotation": s.rotation,
             "windows_ime": self.windows_ime,
+            "agent_running": self.agent_running,
             "clipboard_watch": s.clipboard_watch,
             "keyframe_requests": dict(s.keyframe_requests),
         })
@@ -452,11 +455,37 @@ class Manager:
         self.agent_running += 1
         self._cancel_idle()
         self._cancel_exit()
+        if self._automation_task is not None:
+            self._automation_task.cancel()
+            self._automation_task = None
 
     def agent_ended(self) -> None:
         self.agent_running = max(0, self.agent_running - 1)
         self._arm_idle(IDLE_AFTER_AGENT, "no request from the agent")
+        self._arm_automation_end()
         self.arm_exit()
+
+    def _arm_automation_end(self) -> None:
+        """An agent stopped without finishing (its response interrupted, so no
+        Stop hook and no ictrl_finish) leaves WebDriverAgent running, and with
+        an iCtrl window open the connection stays. End the automation after
+        IDLE_AFTER_AGENT without a request; the connection is left alone."""
+        if self.agent_running:
+            return
+        if self._automation_task is not None:
+            self._automation_task.cancel()
+
+        async def end_when_idle():
+            await asyncio.sleep(IDLE_AFTER_AGENT)
+            self._automation_task = None
+            s = self.session
+            if self.agent_running or s is None or not s.ready or not s.info.automation:
+                return
+            log.info("no request from the agent: ending UI automation")
+            with contextlib.suppress(Exception):
+                await s.wda().stop()
+
+        self._automation_task = asyncio.get_running_loop().create_task(end_when_idle())
 
     def agent_finished(self) -> None:
         """The agent said it is done (ictrl_finish, Claude Code's Stop hook)."""

@@ -64,7 +64,7 @@
         <span class="dock-sep"></span>
         <button class="dock-btn" id="videoBtn" title="画面を映すのをやめる" hidden><svg viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.8"/><path d="M10.5 5.2h3"/><path class="slash" d="M4 3.5l16 17"/></svg></button>
         <button class="dock-btn" id="shotBtn" title="スクリーンショットを保存 (Ctrl+S)"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
-        <button class="dock-btn ime" id="imeBtn" title="日本語 / 英字入力の切替">A</button>
+        <button class="dock-btn ime" id="imeBtn" title="日本語 / 英字入力の切替" hidden>A</button>
         <button class="dock-btn" id="kbdBtn" title="PC キーボードを接続 (Ctrl+K)"><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></button>
       </div>
     </section>
@@ -79,7 +79,7 @@
           <button class="btn icon" id="refreshBtn" title="端末一覧を更新"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></svg></button>
         </div>
         <label class="switch"><input type="checkbox" id="videoOnConnect"><span></span>接続したら画面を映す</label>
-        <label class="switch"><input type="checkbox" id="showImeButton" checked><span></span>下のバーに「A / あ」を表示</label>
+        <label class="switch"><input type="checkbox" id="showImeButton"><span></span>下のバーに「A / あ」を表示</label>
         <label class="switch" title="iCtrl の画面を閉じるか隠して（最小化・裏のタブ）30 秒たったとき、AI が操作を終えたとき（画面が見えていなければ）に切断します"><input type="checkbox" id="autoDisconnect" checked><span></span>使っていないときは iPhone との接続を切る</label>
         <dl class="facts" id="facts"></dl>
         <div id="pairingBox" hidden>
