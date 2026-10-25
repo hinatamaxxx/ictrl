@@ -1434,12 +1434,18 @@ $("#autoDisconnect").addEventListener("change", async (ev) => {
 api("/api/settings").then(applyAutoDisconnect).catch(() => {});
 
 // Display language (i18n.js): "auto" follows the browser. A change, here or
-// in another window, redraws the page in the new language.
+// in another window, redraws the page in the new language; an open menu stays
+// open where it was (restoreMenu at boot).
 $("#language").value = SETTING;
 function applyLanguage(settings) {
   if (!("language" in settings)) return;
   $("#language").value = settings.language;
-  if (adopt(settings.language)) { send({ t: "reloading" }); location.reload(); }
+  if (!adopt(settings.language)) return;
+  if ($(".workspace").classList.contains("panel-open")) {
+    try { sessionStorage.setItem("ictrl.menu", String($("#panel").scrollTop)); } catch (_) {}
+  }
+  send({ t: "reloading" });
+  location.reload();
 }
 $("#language").addEventListener("change", async (ev) => {
   try { applyLanguage(await api("/api/settings", { language: ev.target.value })); }
@@ -1567,12 +1573,24 @@ function setMenu(open) {
 function togglePanel() { setMenu(!$(".workspace").classList.contains("panel-open")); }
 $("#panelToggle").addEventListener("click", togglePanel);
 $("#menuBackdrop").addEventListener("pointerdown", (ev) => { ev.preventDefault(); setMenu(false); });
+// After a language change the menu comes back open, without sliding in again.
+function restoreMenu() {
+  let scroll = null;
+  try { scroll = sessionStorage.getItem("ictrl.menu"); sessionStorage.removeItem("ictrl.menu"); } catch (_) {}
+  if (scroll === null) return;
+  const panel = $("#panel");
+  panel.style.transition = "none";
+  setMenu(true);
+  panel.scrollTop = Number(scroll) || 0;
+  requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.transition = ""; }));
+}
 
 // boot
 // The app window is WebView2 (window/iCtrlWindow.cs); Chrome works too. The
 // video is HEVC decoded by WebCodecs on the GPU.
 if (typeof VideoDecoder === "undefined") toast(t("この画面では映像を再生できません（WebCodecs に対応したブラウザーが必要です）"), true);
 setTransport(state.transport);
+restoreMenu();
 renderStatus();
 connectSocket();
 loadDevices();
