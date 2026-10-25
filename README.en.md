@@ -4,6 +4,12 @@
 
 iCtrl lets the AI on your PC (such as Claude) operate your iPhone. Ask Claude something like "open Settings on the iPhone" and Claude does it. The iPhone's screen is shown on the PC, so you can watch and also use the iPhone yourself with the mouse and keyboard, over a USB cable or the same Wi-Fi network.
 
+| Claude using the iPhone's Calculator | The iPhone's screen on the PC |
+|---|---|
+| ![The iCtrl screen while Claude calculates 12×34 in Calculator; "AI が操作中" (AI at work) at the top and purple dots where Claude pressed](docs/screenshots/ai-calculator.jpg) | ![The iPhone's Home Screen shown in iCtrl](docs/screenshots/home.jpg) |
+
+"AI が操作中" (AI at work) shows at the top, and a purple dot appears where Claude presses.
+
 ## What it does
 
 - Shows the iPhone's screen on the PC (no sound)

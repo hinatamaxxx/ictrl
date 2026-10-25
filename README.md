@@ -6,6 +6,12 @@
 
 > **English summary:** iCtrl mirrors and controls an iPhone from Windows over USB or Wi-Fi on the same local network, and lets Claude Code / Codex drive the same iPhone through MCP. Windows only. Unofficial; not affiliated with Apple.
 
+| Claude が iPhone の計算機を操作しているところ | iPhone の画面をパソコンに映したところ |
+|---|---|
+| ![Claude が計算機で 12×34 を計算している iCtrl の画面。上に「AI が操作中」、Claude が押したボタンに紫の点が出ている](docs/screenshots/ai-calculator.jpg) | ![iCtrl の画面に iPhone のホーム画面が映っている](docs/screenshots/home.jpg) |
+
+上に「AI が操作中」と表示され、Claude が押した所に紫の点が出ます。
+
 ## できること
 
 - iPhone の画面をパソコンに映す（音は出ません）
