@@ -147,6 +147,17 @@ The first time the helper app starts, the iPhone may ask for its passcode. Enter
 
 `iCtrl-WDA.ipa` is Appium's published WebDriverAgent build with only the app ID and the display name changed. The WebDriverAgent license (BSD-3-Clause) is `WebDriverAgent-LICENSE.txt` in the same release. Instead of downloading it, you can also ask Claude to "make the iCtrl helper app IPA": it builds the same file on the PC, on the desktop.
 
+### How iCtrl WDA differs from other WebDriverAgent builds
+
+WebDriverAgent (WDA) is an app widely used by iPhone test automation tools such as Appium. iCtrl WDA is Appium's official build prepared for iCtrl, and it works the same. The differences:
+
+- **Name and ID**: its Home Screen name is "iCtrl WDA" and its app ID is `com.ictrl.wda`. The program inside is not rebuilt; it is Appium's as published.
+- **App IDs used**: Appium's build has two IDs, one for the app and one for the test bundle inside. iCtrl WDA uses one for both, so installing it with a free Apple ID takes only one of the App IDs you may create (10 per 7 days).
+- **Apple components**: as in Appium's build, Xcode's XCTest and other components are not included; the iPhone's own developer components are used (iOS 17 and later).
+- **How it runs**: iCtrl starts it only while Claude reads screen elements and stops it afterwards, because WDA's port (8100) has no authentication and accepts connections from other devices on the network.
+
+If a WDA installed by another tool is already on the iPhone, iCtrl can use it. With both, iCtrl uses iCtrl WDA.
+
 ## A shortcut for faster copying
 
 To bring text copied on the iPhone to the PC quickly, iCtrl uses an iPhone shortcut named "ictrlcopy". iCtrl works without it, but with some apps such as Gmail, copied text then takes about a minute to reach the PC (about a second with ictrlcopy).

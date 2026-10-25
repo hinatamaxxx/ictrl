@@ -27,6 +27,22 @@ log = logging.getLogger(__name__)
 
 PORT = 8100
 RUNNER_EXECUTABLE = "WebDriverAgentRunner-Runner"
+ICTRL_BUNDLE = "com.ictrl.wda"
+
+
+def pick_runner(apps: dict) -> Optional[str]:
+    """The WebDriverAgent runner to start: any installed one works (another
+    tool's too), and with several, iCtrl's own (its bundle ID, which signing
+    tools may extend with a suffix, or its display name) comes first."""
+    runners = sorted(b for b, info in apps.items() if info.get("CFBundleExecutable") == RUNNER_EXECUTABLE)
+    if not runners:
+        return None
+    own = [b for b in runners if b == ICTRL_BUNDLE or b.startswith(ICTRL_BUNDLE + ".")
+           or apps[b].get("CFBundleDisplayName") == "iCtrl WDA"]
+    chosen = (own or runners)[0]
+    if len(runners) > 1:
+        log.info("WebDriverAgent runners installed: %d; using %s", len(runners), chosen)
+    return chosen
 START_TIMEOUT = 40.0
 # Computing "visible"/"accessible" for every node made /source take ~46 s;
 # without them it takes ~2 s.
@@ -149,11 +165,11 @@ class WdaAgent:
         from pymobiledevice3.services.installation_proxy import InstallationProxyService
         async with InstallationProxyService(lockdown=self.session.rsd) as proxy:
             apps = await proxy.get_apps(application_type="User")
-        for bundle, info in apps.items():
-            if info.get("CFBundleExecutable") == RUNNER_EXECUTABLE:
-                return bundle
-        raise WdaError("iCtrl WDA（WebDriverAgent）が iPhone に入っていません。"
-                       "`python -m ictrl wda-ipa` で IPA を作り、AltStore などで入れてください（README「画面の要素で操作する」）")
+        bundle = pick_runner(apps)
+        if bundle is None:
+            raise WdaError("iCtrl WDA（WebDriverAgent）が iPhone に入っていません。"
+                           "README の「補助アプリ（WebDriverAgent）を入れる」の手順で入れてください")
+        return bundle
 
     async def _kill_old_runner(self) -> bool:
         from pymobiledevice3.remote.core_device.app_service import AppServiceService
@@ -696,7 +712,7 @@ WDA_RELEASES = "https://api.github.com/repos/appium/WebDriverAgent/releases/late
 WDA_ASSET = "WebDriverAgentRunner-Runner.zip"
 
 
-def build_ipa(out_path: str, bundle_id: str = "com.ictrl.wda", zip_path: Optional[str] = None) -> dict:
+def build_ipa(out_path: str, bundle_id: str = ICTRL_BUNDLE, zip_path: Optional[str] = None) -> dict:
     """Unsigned IPA of Appium's real-device WebDriverAgent build, ready for
     AltStore/Sideloadly. Nothing from Xcode is added: on iOS 17+ the runner
     uses the XCTest frameworks of the phone's developer disk image (verified
