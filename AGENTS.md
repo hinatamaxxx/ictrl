@@ -37,7 +37,7 @@ powershell -ExecutionPolicy Bypass -File setup.ps1 -Shortcut
 |---|---|
 | Claude Code から使う | `powershell -ExecutionPolicy Bypass -File setup.ps1 -Claude`（MCP サーバーと、応答終了時に WDA を止めるフック） |
 | Claude Code だけで使い、Python を入れたくない | プラグイン: 利用者に Claude Code で `/plugin marketplace add <このリポジトリの URL>` と `/plugin install ictrl@ictrl` を実行してもらう（初回起動時に uv が Python と依存パッケージを用意する。README「Claude Code のプラグインとして入れる」）。`-Claude` とは併用しない |
-| Codex から使う | `powershell -ExecutionPolicy Bypass -File setup.ps1 -Codex` |
+| Codex から使う | プラグイン: `codex plugin marketplace add <このリポジトリの owner/name>` と `codex plugin add ictrl@ictrl`（Python は不要）。アプリとして入れたものを使うなら `powershell -ExecutionPolicy Bypass -File setup.ps1 -Codex` |
 | デスクトップにも置く | `powershell -ExecutionPolicy Bypass -File setup.ps1 -Desktop` |
 | 画面の要素で操作（WebDriverAgent） | README「補助アプリ（WebDriverAgent）を入れる」の手順。プラグイン版は MCP ツール `ictrl_wda_ipa`、それ以外は `.venv\Scripts\python.exe -m ictrl wda-ipa` で IPA を作り、利用者が Sideloadly や AltStore で署名して iPhone に入れる |
 

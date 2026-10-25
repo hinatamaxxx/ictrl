@@ -23,7 +23,7 @@ iCtrl lets the AI on your PC (such as Claude) operate your iPhone. Ask Claude so
 | Item | Notes |
 |---|---|
 | A Windows 10 or 11 PC | Macs are not supported |
-| The Claude desktop app | iCtrl is installed as a Claude plugin and used from Claude Code (the app's "Code" tab) |
+| The Claude desktop app (or Codex) | iCtrl is installed as a plugin of Claude Code (the app's "Code" tab) or of Codex |
 | The Apple Devices app | Needed to connect the iPhone over USB. Free from the [Microsoft Store](https://apps.microsoft.com/detail/9np83lwlpz9k) (not needed if iTunes is installed) |
 | An iPhone | iOS 17.4 or later, with **Developer Mode** on (Settings › Privacy & Security › Developer Mode; the iPhone restarts when you turn it on) |
 | A USB cable | Only for the first connection. After that, Wi-Fi works too |
@@ -31,6 +31,8 @@ iCtrl lets the AI on your PC (such as Claude) operate your iPhone. Ask Claude so
 You do not need to install Python or anything else yourself: the first time iCtrl starts, it downloads what it needs (about 200 MB, some 20 seconds).
 
 ## Install
+
+### As a Claude plugin
 
 1. Open the Claude desktop app and start a new session in the "Code" tab.
 2. Ask:
@@ -52,11 +54,25 @@ You do not need to install Python or anything else yourself: the first time iCtr
 3. Restart the Claude app.
 4. In a new session, ask "Open the iCtrl screen". When the iCtrl screen appears in the browser on the right side of the app, you are done.
 
+### As a Codex plugin
+
+It works the same way in Codex. Ask Codex to "install the iCtrl plugin: marketplace hinatamaxxx/ictrl, plugin ictrl@ictrl", or run these two commands in a terminal.
+
+```bash
+codex plugin marketplace add hinatamaxxx/ictrl
+```
+
+```bash
+codex plugin add ictrl@ictrl
+```
+
+Then ask "open the iCtrl screen" in a new thread. Below, read "Claude" as Codex.
+
 While this repository is private, the plugin installs only on PCs signed in to a GitHub account that can see it.
 
 ### Use it as an app, without Claude
 
-iCtrl also runs as an ordinary Windows app without Claude (opened from the Start menu, in its own window; it needs Python). To use it that way, give an AI agent such as Claude Code or Codex this repository's URL and ask it to "install it as an app": it follows [AGENTS.md](AGENTS.md). Ask the same way to operate the iPhone from Codex.
+iCtrl also runs as an ordinary Windows app without Claude (opened from the Start menu, in its own window; it needs Python). To use it that way, give an AI agent such as Claude Code or Codex this repository's URL and ask it to "install it as an app": it follows [AGENTS.md](AGENTS.md).
 
 ## Connect the iPhone for the first time
 
@@ -207,6 +223,11 @@ The log is at `%LOCALAPPDATA%\iCtrl\logs\ictrl.log`.
 
 - **Update:** ask Claude to "update the iCtrl plugin", then restart the Claude app.
 - **Remove:** ask Claude to "remove the iCtrl plugin". Settings and pairing records stay on the PC. To remove everything, delete the two folders `%APPDATA%\iCtrl` and `%LOCALAPPDATA%\iCtrl`.
+
+For the Codex plugin, run these in a terminal.
+
+- **Update:** run `codex plugin marketplace upgrade ictrl`, then `codex plugin add ictrl@ictrl` again, and start a new thread.
+- **Remove:** run `codex plugin remove ictrl@ictrl`.
 
 For an app installation, ask an AI agent to update or remove it.
 

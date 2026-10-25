@@ -18,6 +18,16 @@ class PluginTests(unittest.TestCase):
         self.assertTrue((ROOT / "plugin" / "ictrl.cmd").exists())
         self.assertTrue((ROOT / "plugin" / "launch.py").exists())
 
+    def test_codex_manifest_points_at_the_entry_point(self):
+        plugin = json.loads((ROOT / ".codex-plugin" / "plugin.json").read_text("utf-8"))
+        mcp = json.loads((ROOT / plugin["mcpServers"]).read_text("utf-8"))["mcpServers"]["ictrl"]
+        self.assertEqual(mcp["cwd"], ".")                     # relative to the plugin folder
+        self.assertIn("plugin\ictrl.cmd", mcp["args"])
+        market = json.loads((ROOT / ".agents" / "plugins" / "marketplace.json").read_text("utf-8"))
+        self.assertEqual(market["plugins"][0]["source"]["path"], "./")
+        # Claude Code also reads a plugin's .mcp.json: none at the root.
+        self.assertFalse((ROOT / ".mcp.json").exists())
+
     def test_entry_point_is_crlf_and_ascii(self):
         data = (ROOT / "plugin" / "ictrl.cmd").read_bytes()
         data.decode("ascii")                      # cmd reads it in the console's code page

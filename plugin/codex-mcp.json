@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "ictrl": {
+      "cwd": ".",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "plugin\\ictrl.cmd",
+        "mcp"
+      ],
+      "env_vars": [
+        "PATH",
+        "PATHEXT",
+        "SYSTEMROOT",
+        "WINDIR",
+        "COMSPEC",
+        "TEMP",
+        "TMP",
+        "USERPROFILE",
+        "USERNAME",
+        "APPDATA",
+        "LOCALAPPDATA",
+        "PROGRAMDATA",
+        "PROGRAMFILES"
+      ],
+      "startup_timeout_sec": 120
+    }
+  }
+}

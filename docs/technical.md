@@ -151,7 +151,7 @@ MCP サーバーと、応答が終わったら WDA を止めるフックがま�
 - 依存パッケージは `requirements.txt` の版とハッシュのとおりにしか入れません（`--require-hashes`、ビルド済みのファイルのみ）。Python 本体は uv が自身に組み込まれたハッシュで照合します。
 - PATH・レジストリ・ほかの Python には触れません。プラグインを外すと、`.venv` と `.uv\` もフォルダーごと消えます（設定・ペアリング記録・ログは `%APPDATA%\iCtrl` と `%LOCALAPPDATA%\iCtrl` に残ります）。
 - 初回の準備が MCP の起動待ちに間に合わなかったときは、`/mcp` で ictrl を再接続してください（途中まで取得したものは再利用します）。
-- Codex は Windows のパッケージアプリで、AppData への書き込みが振り替えられるため、プラグインの代わりに `setup.ps1 -Codex` を使ってください。
+- Codex のプラグインとしても入れられます（`codex plugin marketplace add hinatamaxxx/ictrl`、`codex plugin add ictrl@ictrl`。定義は `.codex-plugin/plugin.json` と `.agents/plugins/marketplace.json`、MCP の設定は `plugin/codex-mcp.json`）。Codex のデスクトップアプリはパッケージアプリで、AppData への書き込みが振り替えられます。そのため、パッケージの中から準備するときは、Python もプラグインのフォルダーの `.uv\python` に入れます（パッケージの外で動く iCtrl のサーバーからも見えるように）。
 
 主なツール: `ictrl_connect`, `ictrl_screenshot`, `ictrl_elements`, `ictrl_tap_element`, `ictrl_wait_for`, `ictrl_scroll_to`, `ictrl_alert`, `ictrl_open_url`, `ictrl_terminate_app`, `ictrl_pinch`, `ictrl_rotate`, `ictrl_orientation`, `ictrl_screenshot_marks`, `ictrl_tap_mark`, `ictrl_tap`, `ictrl_swipe`, `ictrl_type_text`, `ictrl_key`, `ictrl_button`, `ictrl_list_apps`, `ictrl_launch_app`, `ictrl_clipboard`, `ictrl_open_window`, `ictrl_wda_ipa`。タップ座標は直前のスクリーンショット画像のピクセルで指定できます。
 

@@ -4,8 +4,6 @@
 
 パソコンの AI（Claude など）に、iPhone を操作してもらうための道具です。Claude に「iPhone で設定を開いて」のように頼むと、Claude が iPhone を操作します。iPhone の画面はパソコンに映るので、操作の様子を見ながら、自分でもマウスとキーボードで操作できます。USB ケーブルでも、同じ Wi-Fi につないだ状態でも使えます。
 
-> **English summary:** iCtrl mirrors and controls an iPhone from Windows over USB or Wi-Fi on the same local network, and lets Claude Code / Codex drive the same iPhone through MCP. Windows only. Unofficial; not affiliated with Apple.
-
 | Claude が iPhone の計算機を操作しているところ | iPhone の画面をパソコンに映したところ |
 |---|---|
 | ![Claude が計算機で 12×34 を計算している iCtrl の画面。上に「AI が操作中」、Claude が押したボタンに紫の点が出ている](docs/screenshots/ai-calculator.jpg) | ![iCtrl の画面に iPhone のホーム画面が映っている](docs/screenshots/home.jpg) |
@@ -25,7 +23,7 @@
 | もの | 説明 |
 |---|---|
 | Windows 10 か 11 のパソコン | Mac では使えません |
-| Claude のデスクトップアプリ | iCtrl は Claude のプラグインとして入れます。Claude Code（アプリの「Code」タブ）を使います |
+| Claude のデスクトップアプリ（または Codex） | iCtrl は Claude Code（アプリの「Code」タブ）か Codex のプラグインとして入れます |
 | Apple Devices アプリ | パソコンと iPhone を USB でつなぐために必要です。[Microsoft Store](https://apps.microsoft.com/detail/9np83lwlpz9k) から無料で入れられます（iTunes が入っていれば不要です） |
 | iPhone | iOS 17.4 以降。**デベロッパモード** をオンにしておきます（設定 › プライバシーとセキュリティ › デベロッパモード。オンにすると iPhone が再起動します） |
 | USB ケーブル | 最初の 1 回だけ使います。2 回目からは Wi-Fi でも接続できます |
@@ -33,6 +31,8 @@
 Python などのプログラムを自分で入れる必要はありません。iCtrl を最初に起動したときに、必要なものを自動でダウンロードして用意します（約 200MB、20 秒ほど）。
 
 ## 入れ方
+
+### Claude のプラグインとして入れる
 
 1. Claude のデスクトップアプリを開き、「Code」タブで新しいセッションを始めます。
 2. 次のように頼みます。
@@ -54,11 +54,25 @@ Python などのプログラムを自分で入れる必要はありません。i
 3. Claude のアプリを再起動します。
 4. 新しいセッションで「iCtrl の画面を開いて」と頼みます。アプリの右側のブラウザーに iCtrl の画面が出れば完了です。
 
+### Codex のプラグインとして入れる
+
+Codex でも同じように使えます。Codex に「iCtrl のプラグインを入れて。マーケットプレイスは hinatamaxxx/ictrl、プラグインは ictrl@ictrl。」と頼むか、ターミナルで次の 2 つのコマンドを実行します。
+
+```bash
+codex plugin marketplace add hinatamaxxx/ictrl
+```
+
+```bash
+codex plugin add ictrl@ictrl
+```
+
+入れたあとは、新しいスレッドで「iCtrl の画面を開いて」と頼みます。このあとの説明の「Claude」は、Codex に読み替えてください。
+
 このリポジトリが非公開の間は、閲覧できる GitHub アカウントでサインインしているパソコンでだけ入れられます。
 
 ### Claude を使わずにアプリとして使う
 
-iCtrl は Claude を使わずに、ふつうの Windows のアプリとしても動きます（スタートメニューから開き、専用のウィンドウで操作します。Python が必要です）。使いたい場合は、Claude Code や Codex などの AI エージェントにこのリポジトリの URL を渡して、「アプリとして導入して」と頼んでください。AI が [AGENTS.md](AGENTS.md) の手順で入れます。Codex から iPhone を操作したい場合も、同じように頼めます。
+iCtrl は Claude を使わずに、ふつうの Windows のアプリとしても動きます（スタートメニューから開き、専用のウィンドウで操作します。Python が必要です）。使いたい場合は、Claude Code や Codex などの AI エージェントにこのリポジトリの URL を渡して、「アプリとして導入して」と頼んでください。AI が [AGENTS.md](AGENTS.md) の手順で入れます。
 
 ## 初めて iPhone をつなぐ
 
@@ -209,6 +223,11 @@ iPhone がロックされているときに動かないよう、ictrlcopy の設
 
 - **更新：** Claude に「iCtrl のプラグインを更新して」と頼み、Claude のアプリを再起動します。
 - **削除：** Claude に「iCtrl のプラグインを削除して」と頼みます。設定とペアリングの記録はパソコンに残ります。完全に消すときは、`%APPDATA%\iCtrl` と `%LOCALAPPDATA%\iCtrl` の 2 つのフォルダーを削除します。
+
+Codex のプラグインの場合は、ターミナルで次を実行します。
+
+- **更新：** `codex plugin marketplace upgrade ictrl` のあと、`codex plugin add ictrl@ictrl` をもう一度実行し、新しいスレッドを始めます。
+- **削除：** `codex plugin remove ictrl@ictrl` を実行します。
 
 アプリとして入れた場合の更新と削除も、AI エージェントに頼めます。
 

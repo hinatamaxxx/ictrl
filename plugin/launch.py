@@ -45,6 +45,22 @@ def ready() -> bool:
     return PYTHON.exists() and STAMP.exists() and STAMP.read_text().strip() == wanted()
 
 
+def in_package() -> bool:
+    """Whether this runs inside a packaged (MSIX) app, such as the Codex app.
+    Its writes to AppData land in that app's private folder, so a Python
+    installed there would not exist for the iCtrl server, which starts outside
+    the package (ictrl/__main__.py ensure_server)."""
+    if os.name != "nt":
+        return False
+    import ctypes
+    length = ctypes.c_uint32(0)
+    try:
+        result = ctypes.windll.kernel32.GetCurrentPackageFullName(ctypes.byref(length), None)
+    except (AttributeError, OSError):
+        return False
+    return result != 15700   # APPMODEL_ERROR_NO_PACKAGE
+
+
 def uv() -> str:
     found = os.environ.get("UV") or shutil.which("uv")   # uv run sets UV to itself
     if not found:
@@ -80,6 +96,9 @@ def prepare() -> None:
         tool = uv()
         say("初回の準備をしています（Python と依存パッケージ、約 200MB。1 分ほどかかります）…")
         STAMP.unlink(missing_ok=True)
+        if in_package():
+            # The environment's Python goes into this folder, outside AppData.
+            os.environ["UV_PYTHON_INSTALL_DIR"] = str(ROOT / ".uv" / "python")
         subprocess.run([tool, "venv", "--quiet", "--allow-existing", "--managed-python",
                         "--python", PYTHON_VERSION, str(VENV)], check=True, stdout=sys.stderr)
         subprocess.run([tool, "pip", "install", "--quiet", "--python", str(PYTHON),
