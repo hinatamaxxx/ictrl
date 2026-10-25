@@ -456,8 +456,12 @@ function connectSocket() {
   };
   ws.onmessage = (ev) => {
     if (typeof ev.data !== "string") return onBinary(ev.data);
-    const msg = JSON.parse(ev.data);
+    let msg = JSON.parse(ev.data);
     if (msg.t === "status") {
+      // A server just started for a connect button (startServer) first says
+      // "idle": keep showing "connecting" until that connect begins.
+      if (state.starting && msg.state === "idle") msg = { ...msg, state: "connecting", transport: state.transport };
+      else if (msg.state !== "idle") state.starting = false;
       const prev = state.status.state;
       const prevRotation = state.status.rotation;
       const passcodeChanged = prev !== msg.state || state.status.udid !== msg.udid ||
@@ -1311,16 +1315,23 @@ async function startServer() {
 }
 async function doConnect(transport) {
   setTransport(transport);
-  if (state.serverDown && !(await startServer())) {
-    state.status = { state: "idle" };
-    renderStatus();
-    return toast(t(SERVER_START_FAILED), true);
+  if (state.serverDown) {
+    state.starting = true;
+    if (!(await startServer())) {
+      state.starting = false;
+      state.status = { state: "idle" };
+      renderStatus();
+      return toast(t(SERVER_START_FAILED), true);
+    }
   }
   const udid = $("#deviceSelect").value || undefined;
   try {
     await api("/api/connect", { transport, udid });
   } catch (e) {
+    if (state.starting) { state.status = { state: "idle" }; renderStatus(); }
     toast(e.message, true);
+  } finally {
+    state.starting = false;
   }
 }
 $$("[data-connect]").forEach((b) => b.addEventListener("click", () => doConnect(b.dataset.connect)));
