@@ -68,7 +68,7 @@ def main(argv: list[str]) -> None:
             f"- `iCtrl-WDA.ipa` の sha256: `{ipa_sha}`\n\n"
             f"WebDriverAgent: Copyright (c) 2015-present, Facebook, Inc. All rights reserved. "
             f"ライセンスは BSD-3-Clause で、本文はこのリリースの `WebDriverAgent-LICENSE.txt` にあります。"
-            f"iCtrl は Facebook（Meta）および Appium とは関係がなく、承認も受けていません。\n"
+            f"iCtrl は Facebook（Meta）および Appium とは関係がなく、承認も受けていません。\n",
             "utf-8")
         exists = subprocess.run(["gh", "release", "view", TAG, *target], cwd=ROOT, capture_output=True).returncode == 0
         if exists:
