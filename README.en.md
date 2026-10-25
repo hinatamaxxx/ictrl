@@ -183,7 +183,7 @@ Even with the helper app, Claude looks at the screen image when:
 
 To bring text copied on the iPhone to the PC quickly, iCtrl uses an iPhone shortcut named "ictrlcopy". iCtrl works without it, but with some apps such as Gmail, copied text then takes about a minute to reach the PC (about a second with ictrlcopy).
 
-With the helper app (iCtrl WDA) installed, Claude can make the shortcut for you, and you can watch it work the Shortcuts app on the iCtrl screen.
+Claude can make the shortcut for you, and you can watch it work the Shortcuts app on the iCtrl screen. You can ask without the helper app (iCtrl WDA) too, but then Claude works from images of the screen, which takes longer and may not succeed.
 
 ```
 Use iCtrl to operate the iPhone and make the shortcut "ictrlcopy". The steps are in "クリップボード連携のしくみ" of https://github.com/hinatamaxxx/ictrl/blob/main/docs/technical.md.

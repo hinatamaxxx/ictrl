@@ -183,7 +183,7 @@ Claude が iPhone の画面を読む方法は、補助アプリの有無と画�
 
 iPhone でコピーした文字をパソコンに速く届けるために、iPhone のショートカット「ictrlcopy」を使います。なくても使えますが、Gmail など一部のアプリでは、コピーしてからパソコンに届くまで 1 分ほどかかります（ictrlcopy があれば約 1 秒）。
 
-補助アプリ（iCtrl WDA）を入れてあれば、ショートカットも Claude に作ってもらえます。Claude が iPhone のショートカット アプリを操作する様子は、iCtrl の画面でそのまま見ていられます。
+ショートカットは Claude に作ってもらえます。Claude が iPhone のショートカット アプリを操作する様子は、iCtrl の画面でそのまま見ていられます。補助アプリ（iCtrl WDA）がなくても頼めますが、Claude が画面の画像を見ながら操作するので時間がかかり、うまくいかないこともあります。
 
 ```
 iCtrl で iPhone を操作して、ショートカット「ictrlcopy」を作って。作り方は https://github.com/hinatamaxxx/ictrl/blob/main/docs/technical.md の「クリップボード連携のしくみ」にあります。
