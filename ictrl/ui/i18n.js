@@ -346,7 +346,8 @@ const EN = {
   "画面": "Screen",
   "映像": "Video",
   "待機中": "Idle",
-  "iCtrl サーバーに再接続しています…": "Reconnecting to the iCtrl server…",
+  "iCtrl のサーバーが止まっています。Claude などの AI に「iCtrl につないで」と頼むと起動し、この画面も自動でつながります":
+    "The iCtrl server is not running. Ask an AI such as Claude to \"connect to iCtrl\": it starts the server, and this screen reconnects by itself",
   "日本語入力": "Japanese input",
   "英字入力": "English input",
   "（クリック / 半角全角キーで切替。Windows と iPhone の両方が切り替わります）": " (click or the Hankaku/Zenkaku key to switch; both Windows and the iPhone switch)",

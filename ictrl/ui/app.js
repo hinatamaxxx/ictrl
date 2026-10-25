@@ -76,10 +76,21 @@ function toast(msg, bad = false, action = null) {
   toast.timer = setTimeout(() => t.classList.remove("show"), bad ? 5000 : action ? 6000 : 2200);
 }
 
+// The page cannot start the iCtrl server itself (it runs in a browser): when
+// the server is not running, say who can start it instead of "Failed to fetch".
+const SERVER_DOWN = "iCtrl のサーバーが止まっています。Claude などの AI に「iCtrl につないで」と頼むと起動し、この画面も自動でつながります";
 async function api(path, body) {
-  const res = await fetch(path, body === undefined ? {} : {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
-  });
+  // The socket already knows the server is gone: answer at once instead of
+  // waiting about 2 s for Windows to refuse the connection.
+  if (state.serverDown) throw new Error(t(SERVER_DOWN));
+  let res;
+  try {
+    res = await fetch(path, body === undefined ? {} : {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+    });
+  } catch (_) {
+    throw new Error(t(SERVER_DOWN));
+  }
   const ct = res.headers.get("content-type") || "";
   const data = ct.includes("json") ? await res.json() : res;
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
@@ -435,6 +446,7 @@ function connectSocket() {
   ws.binaryType = "arraybuffer";
   state.ws = ws;
   ws.onopen = () => {
+    state.serverDown = false;
     videoOn = null;                         // a new socket: tell the server again
     setVideo(!document.hidden);
   };
@@ -513,7 +525,8 @@ function connectSocket() {
     // is our own process on this PC, not the phone; the phone session is
     // never reopened automatically).
     state.ws = null;
-    state.status = { state: "idle", error: t("iCtrl サーバーに再接続しています…") };
+    state.serverDown = true;
+    state.status = { state: "idle", error: t(SERVER_DOWN) };
     renderStatus();
     setTimeout(connectSocket, 1000);
   };
