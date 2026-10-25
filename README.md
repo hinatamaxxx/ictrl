@@ -4,9 +4,9 @@
 
 iPhone の画面を Windows のパソコンに映して、マウスとキーボードで操作できるアプリです。USB ケーブルでも、同じ Wi-Fi につないだ状態でも使えます。AI の Claude に「iPhone で設定を開いて」のように頼んで、iPhone を操作してもらうこともできます。
 
-Apple とは関係のない非公式のツールです。現状のまま公開しており、不具合の報告、質問、要望は受け付けていません（[LICENSE](LICENSE) の免責のとおり、自己責任で使ってください）。
+Apple とは関係のない非公式のツールです。
 
-> **English summary:** iCtrl mirrors and controls an iPhone from Windows over USB or Wi-Fi on the same local network, and lets Claude Code / Codex drive the same iPhone through MCP. Windows only. Unofficial; not affiliated with Apple. Provided as is: no support, bug reports or feature requests are accepted.
+> **English summary:** iCtrl mirrors and controls an iPhone from Windows over USB or Wi-Fi on the same local network, and lets Claude Code / Codex drive the same iPhone through MCP. Windows only. Unofficial; not affiliated with Apple.
 
 ## できること
 

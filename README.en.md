@@ -4,7 +4,7 @@
 
 iCtrl shows your iPhone's screen on a Windows PC and lets you use it with the mouse and keyboard, over a USB cable or the same Wi-Fi network. You can also ask Claude, the AI assistant, to operate the iPhone for you ("open Settings on the iPhone").
 
-iCtrl is an unofficial tool, not affiliated with Apple. It is provided as is: no support, bug reports or feature requests are accepted (see the disclaimer in [LICENSE](LICENSE)).
+iCtrl is an unofficial tool, not affiliated with Apple.
 
 ## What it does
 
