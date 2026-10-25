@@ -117,6 +117,7 @@ iCtrl は、**USB で直接つながっているか、PC と同じネットワ�
 | スクリーンショット | Ctrl+S かドックのカメラボタン。既定では ピクチャ › iCtrl（OneDrive などに移したピクチャでもその中）に `iPhone 日付 時刻.png` で保存し、クリップボードにもコピー。撮ると画面が白く光り、「フォルダーを開く」でエクスプローラーが前面に開いて撮ったファイルを選んだ状態になる。保存先はメニュー「スクリーンショット」の「変更…」で選べる（AI からは変更できない） |
 | 横向き表示 | iPhone の画面の向き（縦・横）に合わせて自動で回転（クリック位置も合わせて変換）。向きは iOS が画面を回したときの記録（SpringBoard のログ）と、接続時の画面情報で知る |
 | パネル表示切替 | Ctrl+B |
+| 表示の言語 | メニューの「言語 / Language」で 自動 / 日本語 / English。自動はブラウザー（Windows）の言語が日本語なら日本語、それ以外は英語。設定は iCtrl の設定（`settings.json` の `language`）に保存し、開いているほかの画面にも伝わる。切り替えはページを読み直さずに文言だけを書き換えるので、映像・接続・メニューはそのまま |
 
 ### キーボード入力のしくみ
 
@@ -385,7 +386,8 @@ iCtrl は [GNU General Public License v3.0 以降](../LICENSE)（GPL-3.0-or-late
 | Starlette / uvicorn / wsproto | BSD-3-Clause / BSD-3-Clause / MIT | pip |
 | pywin32 | PSF | pip |
 | pywinrt（winrt-*、Windows の OCR を呼ぶ） | MIT | pip |
+| WebView2 SDK（`window\lib\` に同梱、アプリのウィンドウ用） | BSD-3-Clause 型（Microsoft、[ライセンス文](licenses/WebView2-LICENSE.txt)） | Microsoft.Web.WebView2 1.0.4258.31（NuGet）の DLL を無改変で同梱 |
 | WebDriverAgent（任意） | BSD-3-Clause（Appium） | 利用者が `ictrl wda-ipa` で Appium の公式リリースから取得。このリポジトリには含まない |
 
-このリポジトリに含む依存ライブラリのバイナリは、上の `wheels\` の 3 つだけです（PyPI のソースを無改変でビルドしたもの。ライセンス文は各 wheel に同梱）。Apple の SDK・Xcode の部品、IPA は含まれていません。iPhone、iOS、Xcode は Apple Inc. の商標です。iCtrl は Apple Inc. とは関係がなく、Apple による承認や支援を受けていません。
+このリポジトリに含む依存ライブラリのバイナリは、上の `wheels\` の 3 つ（PyPI のソースを無改変でビルドしたもの。ライセンス文は各 wheel に同梱）と、`window\lib\` の WebView2 SDK の DLL 3 つ（Microsoft の配布物そのまま。ライセンス文は `docs/licenses/WebView2-LICENSE.txt`）だけです。Apple の SDK・Xcode の部品、IPA は含まれていません。iPhone、iOS、Xcode は Apple Inc. の商標です。iCtrl は Apple Inc. とは関係がなく、Apple による承認や支援を受けていません。
 
