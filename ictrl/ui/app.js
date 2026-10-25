@@ -1297,6 +1297,7 @@ const serverWaiters = [];
 async function startServer() {
   state.status = { state: "connecting", transport: state.transport };
   renderStatus();
+  toast(t("iCtrl のサーバーを起動しています…"));
   const opened = new Promise((resolve) => serverWaiters.push(resolve));
   let wait = 10000;
   try {
