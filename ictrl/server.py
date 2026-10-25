@@ -162,7 +162,11 @@ def create_app(port: int) -> Starlette:
             path = request.url.path
             is_agent = from_agent(request.headers)
             agent_request.set(is_agent)
-            tracked = is_agent and path not in passive
+            # An agent ending its work (ictrl_finish, Claude Code's Stop hook at
+            # the end of every response) is not an action: it must not show
+            # "AI が操作中" for a moment as the chat ends.
+            finishing = path == "/api/automation/stop"
+            tracked = is_agent and path not in passive and not finishing
             if tracked:
                 manager.agent_started()
                 manager.notify({"t": "agent", "phase": "start", "running": manager.agent_running,
@@ -174,8 +178,8 @@ def create_app(port: int) -> Starlette:
                 if tracked:
                     manager.agent_ended()
                     manager.notify({"t": "agent", "phase": "end", "running": manager.agent_running})
-                    if path == "/api/automation/stop":
-                        manager.agent_finished()    # ictrl_finish / the Stop hook
+                if is_agent and finishing:
+                    manager.agent_finished()        # ictrl_finish / the Stop hook
         return endpoint
 
     async def run_handler(request: Request, handler):
