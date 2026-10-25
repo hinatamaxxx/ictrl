@@ -25,7 +25,9 @@ TOOLS: list[dict[str, Any]] = [
      "inputSchema": {"type": "object", "properties": {}}},
     {"name": "ictrl_devices", "description": "PC から見えている iPhone と使える接続方式（usb / wifi）を一覧する。",
      "inputSchema": {"type": "object", "properties": {}}},
-    {"name": "ictrl_connect", "description": "iPhone に接続して画面ストリームと操作を開始する。既に接続済みなら何もしない。",
+    {"name": "ictrl_connect", "description": ("iPhone に接続して画面ストリームと操作を開始する。既に接続済みなら何もしない。"
+                                              "iCtrl の画面がどこにも開いていなければ、結果に画面の URL が付くので、"
+                                              "自分のアプリ内ブラウザーで開いてユーザーに見せる。"),
      "inputSchema": {"type": "object", "properties": {
          "transport": {"type": "string", "enum": ["usb", "wifi"], "default": "usb",
                        "description": "usb か、PC と同じネットワークの wifi"},
@@ -173,7 +175,14 @@ def handle_tool(client: Client, name: str, args: dict) -> list[dict]:
         body = {"transport": args.get("transport", "usb")}
         if args.get("udid"):
             body["udid"] = args["udid"]
-        return text(client.call("POST", "/api/connect", body, timeout=120))
+        result = client.call("POST", "/api/connect", body, timeout=120)
+        if isinstance(result, dict) and not result.get("pages"):
+            # Nobody sees the phone yet: the agent shows the screen in its own
+            # in-app browser (Claude's browser pane, Codex's), so the user can watch.
+            return text(result) + text(
+                f"iCtrl の画面がまだ開いていません。{client.url}/ を自分のアプリ内ブラウザー"
+                "（Claude のブラウザー画面、Codex のブラウザーなど）で開いて、ユーザーが操作の様子を見られるようにしてください。")
+        return text(result)
     if name == "ictrl_disconnect":
         return text(client.call("POST", "/api/disconnect", {}))
     if name == "ictrl_finish":
@@ -330,6 +339,8 @@ def run(port: int) -> None:
                                        "設定変更やパスコードの取得・入力を AI から行わない。自動入力が無効・停止中の場合はユーザーに対応を頼む"
                                        "（iCtrl ウィンドウの「パスコードを入力」でも可）。"
                                        "頼まれた操作をすべて終えたら ictrl_finish を呼んで UI 自動操作を終了する。"
+                                       "iCtrl を使い始めたら、iCtrl の画面（ictrl_open_window の URL）を自分のアプリ内ブラウザーで開き、"
+                                       "ユーザーが操作の様子を見られるようにする（すでに開いているなら不要。ictrl_connect の結果が知らせる）。"
                                        "ユーザーは同じ画面を iCtrl の画面（アプリ内ブラウザーか iCtrl ウィンドウ）で見ている。")}
         elif method == "tools/list":
             result = {"tools": TOOLS}

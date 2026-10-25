@@ -273,7 +273,7 @@ class Manager:
         s = self.session
         if s is None:
             return {"t": "status", "state": "idle", "windows_ime": self.windows_ime,
-                    "agent_running": self.agent_running}
+                    "agent_running": self.agent_running, "pages": self.pages}
         info = asdict(s.info)
         hub = s.hub
         info.update({
@@ -289,6 +289,7 @@ class Manager:
             "rotation": s.rotation,
             "windows_ime": self.windows_ime,
             "agent_running": self.agent_running,
+            "pages": self.pages,                 # iCtrl screens open (app window, browser tabs)
             "clipboard_watch": s.clipboard_watch,
             "keyframe_requests": dict(s.keyframe_requests),
         })

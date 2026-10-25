@@ -133,6 +133,7 @@ With iCtrl installed, ask Claude, for example:
 On the iPhone, open the Settings app and show the Wi-Fi screen.
 ```
 
+- When Claude starts using iCtrl, it opens the iCtrl screen in the browser on the right side of the app, so you can watch the iPhone and what Claude does.
 - While Claude works, the iCtrl screen shows "AI が操作中" (AI at work) at the top, and a purple dot where Claude touches.
 - Press the ✕ on "AI が操作中" to stop it at once. Use the mouse to take over at any time.
 - Claude never enters the iPhone's passcode.
