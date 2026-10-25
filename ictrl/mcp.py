@@ -181,8 +181,9 @@ def handle_tool(client: Client, name: str, args: dict) -> list[dict]:
             # in-app browser (Claude's browser pane, Codex's), so the user can watch.
             return text(result) + text(
                 f"iCtrl の画面がまだ開いていません。{client.url}/ を自分のアプリ内ブラウザー"
-                "（Claude のブラウザー画面、Codex のブラウザーなど）で開き、そのブラウザーの画面をユーザーに見える位置に表示してください"
-                "（隠れたままにしない）。ユーザーが操作の様子を見られるようにするためです。")
+                "（Claude のブラウザー画面、Codex のブラウザーなど）で開き、"
+                "そのブラウザーをチャットの横に並べて表示してください（チャットは隠さない）。"
+                "ユーザーがチャットと操作の様子を一緒に見られるようにするためです。")
         return text(result)
     if name == "ictrl_disconnect":
         return text(client.call("POST", "/api/disconnect", {}))
@@ -341,7 +342,7 @@ def run(port: int) -> None:
                                        "（iCtrl ウィンドウの「パスコードを入力」でも可）。"
                                        "頼まれた操作をすべて終えたら ictrl_finish を呼んで UI 自動操作を終了する。"
                                        "iCtrl を使い始めたら、iCtrl の画面（ictrl_open_window の URL）を自分のアプリ内ブラウザーで開き、"
-                                       "そのブラウザーの画面をユーザーに見える位置に表示して、操作の様子を見られるようにする"
+                                       "そのブラウザーをチャットの横に並べて表示し（チャットは隠さない）、操作の様子を見られるようにする"
                                        "（すでに開いているなら不要。ictrl_connect の結果が知らせる）。"
                                        "ユーザーは同じ画面を iCtrl の画面（アプリ内ブラウザーか iCtrl ウィンドウ）で見ている。")}
         elif method == "tools/list":
