@@ -14,7 +14,7 @@ iCtrl lets the AI on your PC (such as Claude) operate your iPhone. Ask Claude so
 
 - Shows the iPhone's screen on the PC (no sound)
 - Click to tap, scroll with the mouse wheel, type with the PC keyboard (Japanese input included)
-- Paste text and images copied on the iPhone into the PC, and paste PC text into the iPhone
+- Paste text and images copied on the iPhone into the PC, and paste text and images copied on the PC into the iPhone
 - Saves screenshots of the iPhone on the PC
 - Lets Claude operate the iPhone for you
 
