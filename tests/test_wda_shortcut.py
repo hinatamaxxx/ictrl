@@ -4,10 +4,10 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from ictrl import wda
+from utsushite import wda
 
 
-URL = "shortcuts://run-shortcut?name=ictrlcopy"
+URL = "shortcuts://run-shortcut?name=utsushitecopy"
 
 
 def screen(contents=""):

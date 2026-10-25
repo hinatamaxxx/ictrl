@@ -3,7 +3,7 @@ would not reach it (Settings' 一般 lay under iOS 27's floating
 search field, in the bottom strip where a touch starts the home gesture)."""
 import unittest
 
-from ictrl.server import _obstructed
+from utsushite.server import _obstructed
 
 
 class ObstructedTests(unittest.TestCase):

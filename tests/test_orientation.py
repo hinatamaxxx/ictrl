@@ -1,8 +1,8 @@
 """iOS's interface orientation, read from SpringBoard's log, turns the view."""
 import unittest
 
-from ictrl import physical
-from ictrl.session import DeviceSession
+from utsushite import physical
+from utsushite.session import DeviceSession
 
 
 class OrientationTests(unittest.TestCase):

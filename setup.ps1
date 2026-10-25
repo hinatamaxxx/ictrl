@@ -1,15 +1,15 @@
 ﻿<#
 .SYNOPSIS
-  iCtrl のセットアップ。仮想環境を作り依存関係を入れる。オプションでショートカットや AI 連携を登録する。
+  utsushite のセットアップ。仮想環境を作り依存関係を入れる。オプションでショートカットや AI 連携を登録する。
 
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File setup.ps1
   powershell -ExecutionPolicy Bypass -File setup.ps1 -Shortcut -Claude -Codex
-  （アンインストール: 「設定 → アプリ → インストールされているアプリ」の iCtrl、または uninstall.ps1）
+  （アンインストール: 「設定 → アプリ → インストールされているアプリ」の utsushite、または uninstall.ps1）
 #>
 param(
-  [switch]$Shortcut,   # スタートメニューに「iCtrl」を作る
-  [switch]$Desktop,    # デスクトップにも「iCtrl」を作る
+  [switch]$Shortcut,   # スタートメニューに「utsushite」を作る
+  [switch]$Desktop,    # デスクトップにも「utsushite」を作る
   [switch]$Claude,     # Claude Code（ユーザー全体）に MCP サーバーと応答終了時の停止フックを登録する
   [switch]$Codex       # Codex の ~/.codex/config.toml に MCP サーバーを追記する
 )
@@ -21,7 +21,7 @@ $pythonw = Join-Path $venv 'Scripts\pythonw.exe'
 
 # Python 3.13 以上が必要: Wi-Fi トンネルの TLS-PSK を標準の ssl で行うため
 # （3.12 では sslpsk_pmd3 が OpenSSL 1.1 の DLL を要求して読み込めなかった）。
-# Python は利用者が python.org 版を入れる（iCtrl は同梱も自動取得もしない）。
+# Python は利用者が python.org 版を入れる（utsushite は同梱も自動取得もしない）。
 # Microsoft Store 版は使わない: パッケージ化されたアプリなので、AppData への書き込みが
 # Store の Python 専用の場所へ振り替えられ、設定やペアリング記録が別の場所に分かれる。
 function Find-Python {
@@ -61,14 +61,14 @@ Write-Host '依存関係をインストールしています…'
 & $python -m pip install -q --disable-pip-version-check --upgrade pip
 if ($LASTEXITCODE) { throw 'pip の更新に失敗しました' }
 # requirements.txt は版を固定した一覧。pymobiledevice3 を自身の依存一覧なしで入れるため
-# --no-deps で入れる（その一覧には iCtrl が使わない IPython・PyAV などが含まれる）。
+# --no-deps で入れる（その一覧には utsushite が使わない IPython・PyAV などが含まれる）。
 # PyPI にソースしかない lzfse・pylzss・hexdump は、配布元がビルドした wheels\ の版を使う
 # （tools\build_wheels.py）。--only-binary で、利用者の PC では何もビルドしない。
 & $python -m pip install -q --disable-pip-version-check --no-deps --only-binary ':all:' `
   --find-links (Join-Path $root 'wheels') -r (Join-Path $root 'requirements.txt')
 if ($LASTEXITCODE) { throw '依存関係のインストールに失敗しました' }
 & $python -m pip install -q --disable-pip-version-check --no-deps -e $root
-if ($LASTEXITCODE) { throw 'iCtrl のインストールに失敗しました' }
+if ($LASTEXITCODE) { throw 'utsushite のインストールに失敗しました' }
 # USB の iPhone とは Apple Devices アプリ（または iTunes）のドライバとサービスで通信する。
 # 入れるかどうかは利用者が決める（Microsoft Store のアプリなので、ここでは入れない）。
 # Store 版はパッケージ内の AppleMobileDeviceProcess.exe が仲介し、Windows サービスには現れない。
@@ -79,19 +79,19 @@ if (-not $appleDevices -and -not $itunesService) {
                  "  winget install --id 9NP83LWLPZ9K --source msstore`n" +
                  "  https://apps.microsoft.com/detail/9np83lwlpz9k")
 }
-Write-Host 'OK: iCtrl をインストールしました'
+Write-Host 'OK: utsushite をインストールしました'
 
-# iCtrl のアイコン（%LOCALAPPDATA%\iCtrl\iCtrl.ico。ui/icon.svg と同じ絵）
-$icon = (& $python -c "from ictrl.icon import ensure_ico; print(ensure_ico())").Trim()
-# iCtrl のウィンドウ（WebView2）を Windows 標準の C# コンパイラーでビルドしておく
-& $python -c "from ictrl import window; window.build()"
-if ($LASTEXITCODE -ne 0) { Write-Warning 'iCtrl のウィンドウをビルドできませんでした（最初に開くときにもう一度試します）' }
+# utsushite のアイコン（%LOCALAPPDATA%\utsushite\utsushite.ico。ui/icon.svg と同じ絵）
+$icon = (& $python -c "from utsushite.icon import ensure_ico; print(ensure_ico())").Trim()
+# utsushite のウィンドウ（WebView2）を Windows 標準の C# コンパイラーでビルドしておく
+& $python -c "from utsushite import window; window.build()"
+if ($LASTEXITCODE -ne 0) { Write-Warning 'utsushite のウィンドウをビルドできませんでした（最初に開くときにもう一度試します）' }
 
-function New-ICtrlShortcut([string]$dir) {
+function New-UtsushiteShortcut([string]$dir) {
   $shell = New-Object -ComObject WScript.Shell
-  $lnk = $shell.CreateShortcut((Join-Path $dir 'iCtrl.lnk'))
+  $lnk = $shell.CreateShortcut((Join-Path $dir 'utsushite.lnk'))
   $lnk.TargetPath = $pythonw
-  $lnk.Arguments = '-m ictrl open'
+  $lnk.Arguments = '-m utsushite open'
   $lnk.WorkingDirectory = $root
   $lnk.IconLocation = "$icon,0"
   $lnk.Description = 'Windows から iPhone を操作'
@@ -100,23 +100,23 @@ function New-ICtrlShortcut([string]$dir) {
 
 if ($Shortcut) {
   # スタートメニューはアプリ 1 つにつき 1 つ（フォルダーを作らない）
-  New-ICtrlShortcut (Join-Path ([Environment]::GetFolderPath('StartMenu')) 'Programs')
-  Write-Host 'OK: スタートメニューに iCtrl を作成しました'
+  New-UtsushiteShortcut (Join-Path ([Environment]::GetFolderPath('StartMenu')) 'Programs')
+  Write-Host 'OK: スタートメニューに utsushite を作成しました'
 }
 if ($Desktop) {
-  New-ICtrlShortcut ([Environment]::GetFolderPath('Desktop'))
-  Write-Host 'OK: デスクトップに iCtrl を作成しました'
+  New-UtsushiteShortcut ([Environment]::GetFolderPath('Desktop'))
+  Write-Host 'OK: デスクトップに utsushite を作成しました'
 }
 
 # 「設定 → アプリ → インストールされているアプリ」に載せ、そこからアンインストールできるようにする。
-# iCtrl が書くレジストリはこのアンインストール情報 1 か所だけ（ユーザーごと、HKCU）。
-$version = (& $python -c "import ictrl; print(ictrl.__version__)").Trim()
-$uninstallKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\iCtrl'
+# utsushite が書くレジストリはこのアンインストール情報 1 か所だけ（ユーザーごと、HKCU）。
+$version = (& $python -c "import utsushite; print(utsushite.__version__)").Trim()
+$uninstallKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\utsushite'
 $uninstallPs1 = Join-Path $root 'uninstall.ps1'
 New-Item -Path $uninstallKey -Force | Out-Null
 $sizeKB = [int]((Get-ChildItem $root -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum / 1KB)
 $values = @{
-  DisplayName = 'iCtrl'; DisplayVersion = $version; Publisher = 'hinatamaxxx'
+  DisplayName = 'utsushite'; DisplayVersion = $version; Publisher = 'hinatamaxxx'
   DisplayIcon = $icon; InstallLocation = $root
   UninstallString = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$uninstallPs1`""
   QuietUninstallString = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$uninstallPs1`" -Quiet"
@@ -125,23 +125,23 @@ foreach ($k in $values.Keys) { Set-ItemProperty -Path $uninstallKey -Name $k -Va
 Set-ItemProperty -Path $uninstallKey -Name EstimatedSize -Value $sizeKB -Type DWord
 Set-ItemProperty -Path $uninstallKey -Name NoModify -Value 1 -Type DWord
 Set-ItemProperty -Path $uninstallKey -Name NoRepair -Value 1 -Type DWord
-Write-Host 'OK: 「インストールされているアプリ」に iCtrl を登録しました'
+Write-Host 'OK: 「インストールされているアプリ」に utsushite を登録しました'
 
 if ($Claude) {
-  & claude mcp add --scope user ictrl -- $python -m ictrl mcp
-  Write-Host 'OK: Claude Code に ictrl を登録しました'
+  & claude mcp add --scope user utsushite -- $python -m utsushite mcp
+  Write-Host 'OK: Claude Code に utsushite を登録しました'
   # Claude の応答が終わったら WebDriverAgent と「AI が操作中」を止める
-  & $python -m ictrl claude-hook
+  & $python -m utsushite claude-hook
 }
 
 if ($Codex) {
   $config = Join-Path $HOME '.codex\config.toml'
   $text = if (Test-Path $config) { Get-Content $config -Raw -Encoding utf8 } else { '' }
-  if ($text -match '(?m)^\[mcp_servers\.ictrl\]') {
+  if ($text -match '(?m)^\[mcp_servers\.utsushite\]') {
     Write-Host 'Codex: 既に登録済みです'
   } else {
-    $entry = "`n[mcp_servers.ictrl]`ncommand = '$python'`nargs = [`"-m`", `"ictrl`", `"mcp`"]`n"
+    $entry = "`n[mcp_servers.utsushite]`ncommand = '$python'`nargs = [`"-m`", `"utsushite`", `"mcp`"]`n"
     Add-Content -Path $config -Value $entry -Encoding utf8
-    Write-Host 'OK: Codex に ictrl を登録しました'
+    Write-Host 'OK: Codex に utsushite を登録しました'
   }
 }

@@ -9,8 +9,8 @@ from unittest import mock
 
 from starlette.requests import Request
 
-from ictrl import mcp, passcode, server
-from ictrl.session import SessionError
+from utsushite import mcp, passcode, server
+from utsushite.session import SessionError
 
 
 BROWSER = {"user-agent": "Mozilla/5.0", "origin": "http://127.0.0.1:47800"}
@@ -52,8 +52,8 @@ class AutomaticRouteTests(unittest.TestCase):
 
     def test_agents_and_foreign_origins_cannot_configure(self):
         with mock.patch.object(passcode, "configure_automatic", new_callable=mock.AsyncMock) as configure:
-            for headers in ({"user-agent": "ictrl-mcp"},
-                            {"user-agent": "ictrl-mcp", "origin": BROWSER["origin"]},
+            for headers in ({"user-agent": "utsushite-mcp"},
+                            {"user-agent": "utsushite-mcp", "origin": BROWSER["origin"]},
                             {"user-agent": "Mozilla/5.0"},
                             {**BROWSER, "origin": "https://other.example"}):
                 for enabled in (True, False):
@@ -130,7 +130,7 @@ class AutomaticRouteTests(unittest.TestCase):
                                                               "open_lock_screen": value})
                 self.assertEqual(status, 400)
             status, _ = self.request(action="enter", body={"confirmed_on_device": True},
-                                     headers={"user-agent": "ictrl-mcp"})
+                                     headers={"user-agent": "utsushite-mcp"})
             self.assertEqual(status, 403)
             enter.assert_not_awaited()
             status, _ = self.request(action="enter", body={})
@@ -150,7 +150,7 @@ class McpPasscodeBoundaryTests(unittest.TestCase):
     def test_no_passcode_or_automatic_configuration_tool_is_exposed(self):
         self.assertFalse(any("passcode" in tool["name"] for tool in mcp.TOOLS))
         client = mock.Mock()
-        for name in ("ictrl_passcode", "ictrl_passcode_automatic"):
+        for name in ("utsushite_passcode", "utsushite_passcode_automatic"):
             with self.assertRaises(KeyError):
                 mcp.handle_tool(client, name, {"enabled": True})
         client.call.assert_not_called()
@@ -165,7 +165,7 @@ class McpPasscodeBoundaryTests(unittest.TestCase):
             stdout.flush()
             reply = json.loads(stdout.buffer.getvalue())
         instructions = reply["result"]["instructions"]
-        self.assertLess(instructions.index("ictrl_elements"), instructions.index("ictrl_screenshot"))
+        self.assertLess(instructions.index("utsushite_elements"), instructions.index("utsushite_screenshot"))
         self.assertIn("事前に有効", instructions)
         self.assertNotIn("毎回スクリーンショット", instructions)
 

@@ -1,14 +1,14 @@
 {
-  "name": "ictrl",
+  "name": "utsushite",
   "owner": {
     "name": "hinatamaxxx"
   },
   "metadata": {
-    "description": "iCtrl（Windows から iPhone を操作する MCP サーバー）のプラグイン"
+    "description": "utsushite（Windows から iPhone を操作する MCP サーバー）のプラグイン"
   },
   "plugins": [
     {
-      "name": "ictrl",
+      "name": "utsushite",
       "source": "./",
       "description": "Windows から iPhone を USB か同じネットワークで操作する。Windows 専用。"
     }

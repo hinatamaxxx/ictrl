@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>utsushite</title>
+<link rel="icon" href="/ui/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/ui/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect x="7" y="2.5" width="18" height="27" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="16" cy="16" r="4.2" fill="currentColor"/></svg>
+      <span>utsushite</span>
+    </div>
+    <div class="pill" id="statusPill"><span class="dot"></span><span id="statusText">未接続</span></div>
+    <button class="agent-badge" id="agentBadge" hidden>
+      <span class="spark"></span><span id="agentText">AI が操作中</span><span class="stop" id="agentStop" hidden>✕</span>
+    </button>
+    <div class="spacer"></div>
+    <div class="stats" id="stats" title="映像の統計"></div>
+    <div class="quick">
+      <div class="segmented quick-transport" id="quickTransport" role="radiogroup" aria-label="接続方法">
+        <button role="radio" data-transport="usb" aria-checked="true">USB</button>
+        <button role="radio" data-transport="wifi" aria-checked="false">Wi-Fi</button>
+      </div>
+      <button class="btn quick-connect off" id="quickConnect" disabled>切断</button>
+    </div>
+    <button class="icon-btn" id="panelToggle" title="メニュー (Ctrl+B)" aria-expanded="false" aria-controls="panel">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M15 4v16"/></svg>
+    </button>
+  </header>
+
+  <main class="workspace">
+    <section class="stage" id="stage">
+      <div class="device-area" id="deviceArea">
+      <div class="device" id="device">
+        <canvas id="screen" aria-label="iPhone の画面"></canvas>
+        <div class="touches" id="touches"></div>
+        <div class="screen-overlay" id="overlay">
+          <div class="empty">
+            <svg class="empty-icon" viewBox="0 0 48 48"><rect x="12" y="4" width="24" height="40" rx="6"/><path d="M21 9h6"/></svg>
+            <h1 id="emptyTitle">iPhone を接続</h1>
+            <p id="emptyText">USB ケーブルまたは同じ Wi-Fi で接続できます。</p>
+            <div class="empty-actions">
+              <button class="btn primary" data-connect="usb">
+                <svg viewBox="0 0 24 24"><path d="M12 3v13M8 7l4-4 4 4M7 13v3a5 5 0 0 0 10 0v-3"/></svg>USB で接続</button>
+              <button class="btn" data-connect="wifi">
+                <svg viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r="1.2"/></svg>Wi-Fi で接続</button>
+            </div>
+            <div class="progress" id="progress" hidden><div class="bar"></div><span id="progressText"></span></div>
+            <p class="error" id="errorText" hidden></p>
+            <button class="btn primary" id="videoResume" hidden>画面を映す</button>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="dock" id="dock">
+        <button class="dock-btn" data-button="home" title="ホーム (Ctrl+H)"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5M5.5 9.8V20h13V9.8"/></svg></button>
+        <button class="dock-btn" data-button="app-switcher" title="アプリ切替"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="7" height="12" rx="2"/><rect x="14" y="6" width="7" height="12" rx="2"/></svg></button>
+        <span class="dock-sep"></span>
+        <button class="dock-btn" id="lockBtn" title="iPhone をロック"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+        <span class="dock-sep"></span>
+        <button class="dock-btn" id="videoBtn" title="画面を映すのをやめる" hidden><svg viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.8"/><path d="M10.5 5.2h3"/><path class="slash" d="M4 3.5l16 17"/></svg></button>
+        <button class="dock-btn" id="shotBtn" title="スクリーンショットを保存 (Ctrl+S)"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+        <button class="dock-btn ime" id="imeBtn" title="日本語 / 英字入力の切替" hidden>A</button>
+        <button class="dock-btn" id="kbdBtn" title="PC キーボードを接続 (Ctrl+K)"><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></button>
+      </div>
+    </section>
+
+    <div class="menu-backdrop" id="menuBackdrop" aria-hidden="true"></div>
+    <aside class="panel" id="panel" aria-label="メニュー">
+      <div class="card">
+        <div class="card-head"><h2>接続</h2></div>
+        <label class="field-label" for="deviceSelect">端末</label>
+        <div class="row">
+          <select id="deviceSelect" class="grow"><option value="">検出中…</option></select>
+          <button class="btn icon" id="refreshBtn" title="端末一覧を更新"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></svg></button>
+        </div>
+        <label class="switch"><input type="checkbox" id="videoOnConnect"><span></span>接続したら画面を映す</label>
+        <label class="switch"><input type="checkbox" id="showImeButton"><span></span>下のバーに「A / あ」を表示</label>
+        <label class="switch" title="オフ（おすすめ）のときは、AI が操作を終えたとき、人の操作も AI の操作もないまま 5 分たったとき、utsushite の画面を閉じるか隠して 30 秒たったときに、iPhone との接続を切ります"><input type="checkbox" id="autoDisconnect"><span></span>使っていなくても接続を続ける（非推奨）</label>
+        <p class="small">オフのときは、AI が操作を終えたとき、人も AI も操作しないまま 5 分たったとき、画面を閉じるか隠して 30 秒たったときに、iPhone との接続を自動で切ります。</p>
+        <label class="field-label" for="language">言語 / Language</label>
+        <select id="language">
+          <option value="auto">自動</option>
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+        </select>
+        <dl class="facts" id="facts"></dl>
+        <div id="pairingBox" hidden>
+          <p class="small">iPhone の「ペアリング済みのコンピュータ」に utsushite として表示されるよう、utsushite 専用の「信頼」を作れます（iPhone で「信頼」とパスコード入力が一度必要。他のアプリの信頼はそのまま）。</p>
+          <div class="row"><button class="btn grow" id="pairingBtn">utsushite 専用の信頼を作成</button></div>
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="card-head"><h2>クリップボード</h2><span class="hint" id="clipWatch"></span></div>
+        <label class="switch"><input type="checkbox" id="autoCopy" checked><span></span>iPhone でコピーしたら PC に自動で反映</label>
+        <div class="row">
+          <button class="btn grow" id="clipPull" title="iPhone のクリップボードを今すぐ PC へ">iPhone → PC</button>
+        </div>
+        <ul class="clips" id="clips"><li class="muted">iPhone でコピーするとここに並びます</li></ul>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>スクリーンショット</h2><span class="hint">Ctrl+S</span></div>
+        <label class="field-label">保存先</label>
+        <div class="path-box" id="shotFolder" title="">読み込み中…</div>
+        <div class="row">
+          <button class="btn grow" id="shotFolderPick">変更…</button>
+          <button class="btn grow" id="shotFolderOpen">開く</button>
+          <button class="btn" id="shotFolderReset" title="ピクチャの utsushite フォルダーに戻す" hidden>既定に戻す</button>
+        </div>
+      </div>
+
+      <div class="card grow-card">
+        <div class="card-head"><h2>アプリ</h2><button class="link" id="loadApps">読み込む</button></div>
+        <input id="appSearch" type="search" placeholder="アプリを検索" autocomplete="off">
+        <ul class="apps" id="apps"><li class="muted">接続後に「読み込む」</li></ul>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>AI から操作</h2></div>
+        <p class="small">Claude Code / Codex に MCP サーバーとして登録すると、AI がこの画面を見ながら iPhone を操作できます。</p>
+        <div class="row">
+          <button class="btn grow" data-copy="claude">Claude Code 用をコピー</button>
+          <button class="btn grow" data-copy="codex">Codex 用をコピー</button>
+        </div>
+        <p class="small">AI が画面の要素を読むときだけ、iPhone の UI 自動操作（WebDriverAgent）が動き、iPhone に「Automation Running」と出ます（iOS の表示で、日本語にも非表示にもできません）。接続を切るか、下のボタンで消えます。iPhone 単体では、音量ボタンを両方長押しでも止まります。</p>
+        <div class="row"><button class="btn grow" id="automationStop">自動操作を終了（Automation Running を消す）</button></div>
+        <label class="small" for="wdaMode">画面要素の読み取り（WebDriverAgent）</label>
+        <select id="wdaMode">
+          <option value="on_demand">AI が使うときだけ起動（既定）</option>
+          <option value="off">使わない（文字認識のみ・パスコード要求なし）</option>
+        </select>
+        <p class="small" id="wdaModeHelp"></p>
+      </div>
+
+      <div class="card" id="passcodeCard">
+        <div class="card-head"><h2>WDA のパスコード入力</h2><span class="hint" id="passcodeState"></span></div>
+        <p class="small">パスコードはこの PC の Windows 資格情報マネージャーに保存され、AI には渡しません。</p>
+        <div class="row"><button class="btn primary grow" id="passcodeEnter" aria-describedby="passcodeEnterHelp" hidden>パスコードを入力</button></div>
+        <p class="small" id="passcodeEnterHelp">自動入力が動かないときに使えます。XCTest のパスコード画面を確認し、未入力の場合だけ送信します。</p>
+        <div class="row" id="passcodeSaveRow" hidden>
+          <input class="grow" id="passcodeInput" type="password" inputmode="numeric" autocomplete="off" placeholder="iPhone のパスコード">
+          <button class="btn" id="passcodeSave">保存</button>
+        </div>
+        <div class="row"><button class="link" id="passcodeDelete" hidden>保存したパスコードを削除</button></div>
+        <div class="passcode-auto">
+          <label class="switch" for="passcodeAutomatic">
+            <input id="passcodeAutomatic" type="checkbox" aria-describedby="passcodeAutomaticState passcodeAutomaticHelp" disabled>
+            <span aria-hidden="true"></span>この iPhone の XCTest 要求に自動入力
+          </label>
+          <p class="small" id="passcodeAutomaticState" role="status">設定を読み込んでいます…</p>
+          <p class="small" id="passcodeAutomaticHelp">WDA 起動時の XCTest 要求を画面で確認し、1 回だけ入力します。WDA の起動成功を確認して、次の要求に備えます。</p>
+          <button class="btn" id="passcodeAutomaticReset" hidden>確認して再有効化</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+<textarea id="kbdSink" class="kbd-sink" aria-hidden="true" tabindex="-1" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+<div class="ctx" id="ctxMenu" role="menu" hidden>
+  <button data-ctx="copy"><span>コピー</span><kbd>Ctrl+C</kbd></button>
+  <button data-ctx="cut"><span>切り取り</span><kbd>Ctrl+X</kbd></button>
+  <button data-ctx="paste"><span>貼り付け</span><kbd>Ctrl+V</kbd></button>
+  <button data-ctx="selectall"><span>すべて選択</span><kbd>Ctrl+A</kbd></button>
+  <hr>
+  <button data-ctx="undo"><span>元に戻す</span><kbd>Ctrl+Z</kbd></button>
+  <button data-ctx="redo"><span>やり直し</span><kbd>Ctrl+Y</kbd></button>
+  <hr>
+  <button data-ctx="longpress"><span>ここを長押し</span><kbd>メニュー/選択</kbd></button>
+  <button data-ctx="word"><span>単語を選択</span><kbd>ダブルクリック</kbd></button>
+  <hr>
+  <button data-ctx="saveshot"><span>スクリーンショットを保存</span><kbd>Ctrl+S</kbd></button>
+  <button data-ctx="shotfolder"><span>スクリーンショットのフォルダーを開く</span><kbd></kbd></button>
+  <button data-ctx="shot"><span>画面を PC にコピー</span><kbd></kbd></button>
+  <button data-ctx="home"><span>ホームへ</span><kbd>Ctrl+H</kbd></button>
+</div>
+<div class="modal" id="shortcutHelp" hidden>
+  <div class="modal-card" role="dialog" aria-labelledby="shTitle">
+    <h2 id="shTitle">iPhone にショートカットを追加してください</h2>
+    <p data-i18n="shIntro">iPhone でコピーした文字を PC にすぐ届けるには、iPhone のショートカット「<b>utsushitecopy</b>」が必要です。
+       見つからなかったか、反応しませんでした。</p>
+    <ol>
+      <li data-i18n="sh1">iPhone で <b>ショートカット</b> アプリを開き、下の <b>＋</b> → 右上の <b>編集</b></li>
+      <li data-i18n="sh2">アクションを順に追加：<b>クリップボードを取得</b> → <b>入力からテキストを取得</b> → <b>if 文</b>（条件「テキスト」「任意の値」）</li>
+      <li data-i18n="sh3"><b>クリップボードにコピー</b> を if 文の「の場合」の中へ入れる（「その他の場合」には何も入れない）</li>
+      <li id="shKeyboardStep" data-i18n="sh4">キーボード接続方式では、<b>オートメーション</b> → <b>キーボード</b>（接続されたとき）を追加し、有効にする。<b>通知</b> はオフ</li>
+      <li data-i18n="sh5">名前を <b>utsushitecopy</b> にして保存</li>
+    </ol>
+    <p class="small">AI（Claude / Codex）に「utsushite のショートカットを作って」と頼むと、utsushite 経由で代わりに作成することもできます。</p>
+    <div class="row"><button class="btn primary grow" id="shTest">追加したので試す</button><button class="btn" id="shClose">閉じる</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="dock-tip" id="dockTip" role="tooltip" hidden></div>
+<div class="shot-flash" id="shotFlash"></div>
+<script src="/ui/app.js" type="module"></script>
+</body>
+</html>

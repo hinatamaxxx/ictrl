@@ -6,8 +6,8 @@ from unittest import mock
 
 from pymobiledevice3.remote import userspace_tunnel
 
-from ictrl.session import DeviceSession
-from ictrl.tunnel import SessionTunnel
+from utsushite.session import DeviceSession
+from utsushite.tunnel import SessionTunnel
 
 
 class SessionTunnelTests(unittest.IsolatedAsyncioTestCase):
@@ -122,7 +122,7 @@ class SessionTunnelTests(unittest.IsolatedAsyncioTestCase):
         session.info.state = "ready"
         closing = asyncio.Event()
         session.close = mock.AsyncMock(side_effect=lambda **_kwargs: closing.set())
-        with self.assertLogs("ictrl.session", level="WARNING") as captured:
+        with self.assertLogs("utsushite.session", level="WARNING") as captured:
             session.lost("outer transport closed")
             session.lost("video receiver ended", OSError("Bad file descriptor"))
             await asyncio.wait_for(closing.wait(), 1)

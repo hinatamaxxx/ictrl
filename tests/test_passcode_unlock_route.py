@@ -6,8 +6,8 @@ from unittest import mock
 
 from starlette.requests import Request
 
-from ictrl import server
-from ictrl.session import SessionError
+from utsushite import server
+from utsushite.session import SessionError
 
 
 class UnlockRouteTests(unittest.IsolatedAsyncioTestCase):
@@ -40,8 +40,8 @@ class UnlockRouteTests(unittest.IsolatedAsyncioTestCase):
         self.manager.require.assert_not_called()
 
     async def test_missing_gui_identity_or_wrong_origin_never_dispatches(self):
-        denied = ({}, {"user-agent": "ictrl-mcp"},
-                  {"user-agent": "ictrl-mcp", "origin": "http://127.0.0.1:47800"},
+        denied = ({}, {"user-agent": "utsushite-mcp"},
+                  {"user-agent": "utsushite-mcp", "origin": "http://127.0.0.1:47800"},
                   {"user-agent": "Mozilla/5.0"},
                   {"user-agent": "Mozilla/5.0", "origin": "https://other.example"},
                   {"user-agent": "Mozilla/5.0", "origin": "http://127.0.0.1:47801"})

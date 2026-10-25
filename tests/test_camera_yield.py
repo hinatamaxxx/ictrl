@@ -3,8 +3,8 @@ import asyncio
 import unittest
 from unittest import mock
 
-from ictrl import physical
-from ictrl.session import DeviceSession
+from utsushite import physical
+from utsushite.session import DeviceSession
 
 IN_USE = ("[Recording Indicator] Active camera/microphone activity changed:\n{(\n"
           "    <SBSensorActivityAttribution: 0x1; displayName: カメラ; bundleIdentifier: com.apple.camera; "

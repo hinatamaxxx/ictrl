@@ -1,4 +1,4 @@
-"""Screen-element logic of ictrl.wda, from trees and cases seen on iOS 27."""
+"""Screen-element logic of utsushite.wda, from trees and cases seen on iOS 27."""
 import asyncio
 import contextlib
 import unittest
@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from types import SimpleNamespace
 from unittest import mock
 
-from ictrl import passcode, wda
+from utsushite import passcode, wda
 
 
 def tree(xml: str):
@@ -125,7 +125,7 @@ class StartupListenerTests(unittest.TestCase):
                      (listener.test_bundle_ready_with_capabilities, (payload,), "bundle-capabilities"),
                      (listener.did_begin_initializing_for_ui_testing, (), "ui-initializing"),
                      (listener.did_begin_executing_test_plan, (), "test-plan-started")]
-        with self.assertLogs("ictrl.wda", level="INFO") as captured:
+        with self.assertLogs("utsushite.wda", level="INFO") as captured:
             for callback, args, kind in callbacks:
                 with self.subTest(kind=kind):
                     # A callback must finish in its first coroutine step. Any
@@ -137,7 +137,7 @@ class StartupListenerTests(unittest.TestCase):
         self.assertEqual(entry.notify_startup_event.call_args_list,
                          [mock.call(kind) for _, _, kind in callbacks])
         self.assertEqual(captured.output,
-                         [f"INFO:ictrl.wda:XCTest startup event: {kind}" for _, _, kind in callbacks])
+                         [f"INFO:utsushite.wda:XCTest startup event: {kind}" for _, _, kind in callbacks])
 
 
 class StartupTests(unittest.IsolatedAsyncioTestCase):
@@ -191,7 +191,7 @@ class StartupTests(unittest.IsolatedAsyncioTestCase):
     async def asyncTearDown(self):
         await self.agent.stop()
         self.assertFalse([t for t in asyncio.all_tasks()
-                          if not t.done() and t.get_name().startswith("ictrl-wda")])
+                          if not t.done() and t.get_name().startswith("utsushite-wda")])
 
     async def start(self):
         caller = asyncio.create_task(self.agent.ensure())

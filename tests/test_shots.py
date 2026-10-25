@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from ictrl import shots
+from utsushite import shots
 
 
 class SaveTests(unittest.TestCase):
@@ -37,8 +37,8 @@ class SaveTests(unittest.TestCase):
         self.assertEqual(size(shots.as_viewed(portrait, 90)), (2622, 1206))
         self.assertIs(shots.as_viewed(landscape, -90), landscape)
 
-    def test_default_is_an_ictrl_folder_in_pictures(self):
-        self.assertEqual(shots.default_folder().name, "iCtrl")
+    def test_default_is_an_utsushite_folder_in_pictures(self):
+        self.assertEqual(shots.default_folder().name, "utsushite")
 
     def test_custom_folder_setting(self):
         with tempfile.TemporaryDirectory() as tmp:

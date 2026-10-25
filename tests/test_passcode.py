@@ -6,7 +6,7 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from ictrl import passcode
+from utsushite import passcode
 import test_passcode_automatic as automatic
 
 SECRET = "975310"
@@ -16,7 +16,7 @@ CLOCK = [{"text": "10月17日土曜日", "x": 15, "y": 20, "w": 70, "h": 10},
 
 def call_route(path: str, headers: dict, body: dict) -> tuple[int, dict]:
     from starlette.requests import Request
-    from ictrl.server import create_app
+    from utsushite.server import create_app
     app = create_app(47800)
     route = next(r for r in app.routes if getattr(r, "path", None) == "/api/passcode/{action}")
     raw = json.dumps(body).encode()
@@ -35,10 +35,10 @@ class RouteTests(unittest.TestCase):
     def test_agent_requests_are_refused(self):
         with mock.patch.object(passcode, "enter") as enter, mock.patch.object(passcode, "save") as save:
             for action in ("enter", "save", "delete"):
-                status, _ = call_route(f"/api/passcode/{action}", {"user-agent": "ictrl-mcp"},
+                status, _ = call_route(f"/api/passcode/{action}", {"user-agent": "utsushite-mcp"},
                                        {"passcode": SECRET})
                 self.assertEqual(status, 403, action)
-            # A browser user agent without the iCtrl origin is refused too.
+            # A browser user agent without the utsushite origin is refused too.
             status, _ = call_route("/api/passcode/enter", {"user-agent": "Mozilla/5.0"}, {})
             self.assertEqual(status, 403)
         enter.assert_not_called()
@@ -89,7 +89,7 @@ class EnterTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_typed_once_and_never_logged(self):
         self.session._stroke.side_effect = OSError(SECRET)
-        with self.assertLogs("ictrl.passcode", logging.DEBUG) as logs:
+        with self.assertLogs("utsushite.passcode", logging.DEBUG) as logs:
             with self.assertRaises(passcode.PasscodeError) as raised:
                 await passcode.enter(self.session)
         self.assertEqual(self.session._stroke.await_count, 1)  # no retry

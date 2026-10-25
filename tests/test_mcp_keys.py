@@ -4,7 +4,7 @@ import sys
 import unittest
 from unittest import mock
 
-from ictrl import keys, mcp
+from utsushite import keys, mcp
 
 
 class KeysTests(unittest.TestCase):
@@ -26,7 +26,7 @@ class McpTests(unittest.TestCase):
         stdin = io.TextIOWrapper(io.BytesIO("\n".join(json.dumps(m) for m in messages).encode()), encoding="utf-8")
         stdout = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
         # Even a handshake ends with automation/stop on EOF; never let this
-        # unit test contact the running iCtrl server or the user's iPhone.
+        # unit test contact the running utsushite server or the user's iPhone.
         with mock.patch.object(sys, "stdin", stdin), mock.patch.object(sys, "stdout", stdout), \
                 mock.patch.object(mcp.Client, "call", return_value={}, side_effect=call_error):
             mcp.run(1)
@@ -40,14 +40,14 @@ class McpTests(unittest.TestCase):
             {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
             {"jsonrpc": "2.0", "id": 3, "method": "bogus"})
         self.assertEqual([r["id"] for r in replies], [1, 2, 3])
-        self.assertEqual(replies[0]["result"]["serverInfo"]["name"], "ictrl")
+        self.assertEqual(replies[0]["result"]["serverInfo"]["name"], "utsushite")
         names = {t["name"] for t in replies[1]["result"]["tools"]}
-        self.assertIn("ictrl_screenshot", names)
+        self.assertIn("utsushite_screenshot", names)
         self.assertEqual(replies[2]["error"]["code"], -32601)
 
     def test_tool_error_is_reported_not_raised(self):
         replies = self.run_session({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-                                    "params": {"name": "ictrl_tap", "arguments": {"x": 0.5, "y": 0.5}}},
+                                    "params": {"name": "utsushite_tap", "arguments": {"x": 0.5, "y": 0.5}}},
                                    call_error=RuntimeError("iPhoneに接続されていません"))
         self.assertTrue(replies[0]["result"]["isError"])
         self.assertIn("接続されていません", replies[0]["result"]["content"][0]["text"])

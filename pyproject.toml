@@ -3,7 +3,7 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ictrl"
+name = "utsushite"
 version = "0.1.0"
 description = "Control an iPhone from Windows over USB or Wi-Fi, from a GUI or from AI agents (MCP)."
 requires-python = ">=3.13"
@@ -11,7 +11,7 @@ license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 # Install with setup.ps1, which uses requirements.txt (exact versions,
 # --no-deps): pymobiledevice3's own dependency list pulls in IPython, PyAV,
-# FastAPI and other tools iCtrl does not use. These are the direct ones.
+# FastAPI and other tools utsushite does not use. These are the direct ones.
 dependencies = [
     "starlette",
     "uvicorn",
@@ -29,10 +29,10 @@ dependencies = [
 ]
 
 [project.scripts]
-ictrl = "ictrl.__main__:main"
+utsushite = "utsushite.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["ictrl*"]
+include = ["utsushite*"]
 
 [tool.setuptools.package-data]
-ictrl = ["ui/*"]
+utsushite = ["ui/*"]

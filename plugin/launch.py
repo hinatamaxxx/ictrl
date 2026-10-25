@@ -1,5 +1,5 @@
-"""Start iCtrl from the Claude Code plugin (or any MCP client) with uv.
-plugin/ictrl.cmd finds or fetches uv and runs this:
+"""Start utsushite from the Claude Code plugin (or any MCP client) with uv.
+plugin/utsushite.cmd finds or fetches uv and runs this:
 
     uv run --no-project --managed-python --python 3.14 plugin/launch.py mcp
 
@@ -10,7 +10,7 @@ against its hash (--require-hashes), binaries only, and pymobiledevice3
 without its own dependency list (--no-deps; see requirements.txt). Nothing
 outside this folder and uv's cache is written; removing the plugin removes it.
 
-Standard library only: this runs before iCtrl's packages exist. Progress goes
+Standard library only: this runs before utsushite's packages exist. Progress goes
 to stderr, because stdout is the MCP connection.
 """
 from __future__ import annotations
@@ -25,12 +25,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 VENV = ROOT / ".venv"
 PYTHON = VENV / "Scripts" / "python.exe"
-STAMP = VENV / "ictrl-requirements.sha256"
+STAMP = VENV / "utsushite-requirements.sha256"
 PYTHON_VERSION = "3.14"
 
 
 def say(text: str) -> None:
-    print(f"iCtrl: {text}", file=sys.stderr, flush=True)
+    print(f"utsushite: {text}", file=sys.stderr, flush=True)
 
 
 def wanted() -> str:
@@ -48,8 +48,8 @@ def ready() -> bool:
 def in_package() -> bool:
     """Whether this runs inside a packaged (MSIX) app, such as the Codex app.
     Its writes to AppData land in that app's private folder, so a Python
-    installed there would not exist for the iCtrl server, which starts outside
-    the package (ictrl/__main__.py ensure_server)."""
+    installed there would not exist for the utsushite server, which starts outside
+    the package (utsushite/__main__.py ensure_server)."""
     if os.name != "nt":
         return False
     import ctypes
@@ -64,7 +64,7 @@ def in_package() -> bool:
 def uv() -> str:
     found = os.environ.get("UV") or shutil.which("uv")   # uv run sets UV to itself
     if not found:
-        raise SystemExit("iCtrl: uv が見つかりません。次のコマンドで入れてから、もう一度試してください。\n"
+        raise SystemExit("utsushite: uv が見つかりません。次のコマンドで入れてから、もう一度試してください。\n"
                          "  winget install astral-sh.uv")
     return found
 
@@ -76,7 +76,7 @@ class _SetupLock:
         import ctypes
         self.kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
         self.kernel32.CreateMutexW.restype = ctypes.c_void_p
-        name = "Local\\iCtrl-setup-" + hashlib.sha256(str(ROOT).lower().encode()).hexdigest()[:16]
+        name = "Local\\utsushite-setup-" + hashlib.sha256(str(ROOT).lower().encode()).hexdigest()[:16]
         self.handle = self.kernel32.CreateMutexW(None, False, name)
         self.kernel32.WaitForSingleObject(ctypes.c_void_p(self.handle), 0xFFFFFFFF)
         return self
@@ -105,11 +105,11 @@ def prepare() -> None:
                         "--no-deps", "--only-binary", ":all:", "--require-hashes",
                         "--find-links", str(ROOT / "wheels"),
                         "-r", str(ROOT / "requirements.txt")], check=True, stdout=sys.stderr)
-        # iCtrl itself runs from this folder, as setup.ps1's editable install does,
+        # utsushite itself runs from this folder, as setup.ps1's editable install does,
         # without building anything.
         site = Path(subprocess.run([str(PYTHON), "-c", "import sysconfig; print(sysconfig.get_path('purelib'))"],
                                    check=True, capture_output=True, text=True).stdout.strip())
-        (site / "ictrl.pth").write_text(str(ROOT) + "\n", encoding="utf-8")
+        (site / "utsushite.pth").write_text(str(ROOT) + "\n", encoding="utf-8")
         STAMP.write_text(wanted() + "\n")
         say("準備ができました")
 
@@ -122,7 +122,7 @@ def main(argv: list[str]) -> int:
         say(f"準備に失敗しました（{Path(error.cmd[0]).name} {error.cmd[1]}、終了コード {error.returncode}）。"
             "ネットワークを確かめて、もう一度試してください")
         return 1
-    return subprocess.run([str(PYTHON), "-m", "ictrl", *argv]).returncode
+    return subprocess.run([str(PYTHON), "-m", "utsushite", *argv]).returncode
 
 
 if __name__ == "__main__":

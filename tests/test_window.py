@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from ictrl import window
+from utsushite import window
 
 
 @unittest.skipUnless(os.name == "nt" and window.csc().exists(), "needs the .NET Framework csc")
@@ -12,7 +12,7 @@ class WindowBuildTest(unittest.TestCase):
     def test_builds_with_the_windows_csc_and_skips_when_current(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp)
-            with mock.patch.object(window, "OUT_DIR", out), mock.patch.object(window, "EXE", out / "iCtrlWindow.exe"):
+            with mock.patch.object(window, "OUT_DIR", out), mock.patch.object(window, "EXE", out / "UtsushiteWindow.exe"):
                 exe = window.build()
                 self.assertTrue(exe.exists())
                 for dll in window._DLLS:

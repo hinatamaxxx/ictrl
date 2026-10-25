@@ -2,7 +2,7 @@
 
     python tools/hash_requirements.py
 
-Each pinned line gets the hashes of its 64-bit Windows wheels on PyPI (iCtrl
+Each pinned line gets the hashes of its 64-bit Windows wheels on PyPI (utsushite
 installs binaries only), or of the wheel in wheels/ for the packages PyPI
 has as source only.
 Comments and order are kept. Run it again after changing a version.
@@ -32,7 +32,7 @@ def local_hashes(name: str, version: str) -> list[str]:
 def pypi_hashes(name: str, version: str) -> list[str]:
     with urllib.request.urlopen(f"https://pypi.org/pypi/{normalize(name)}/{version}/json", timeout=30) as r:
         files = json.load(r)["urls"]
-    # iCtrl runs on 64-bit Windows only
+    # utsushite runs on 64-bit Windows only
     return sorted(f["digests"]["sha256"] for f in files
                   if f["filename"].endswith(("-win_amd64.whl", "-any.whl")))
 

@@ -14,21 +14,21 @@ def word(text, x, w=20, h=20):
 
 class OcrTests(unittest.TestCase):
     def test_side_by_side_buttons_are_split(self):
-        from ictrl import ocr
+        from utsushite import ocr
         line = [word(c, 10 + i * 22) for i, c in enumerate("キャンセル")] + [word("OK", 400)]
         texts = [ocr._join(group)["text"] for group in ocr._segments(line)]
         self.assertEqual(texts, ["キャンセル", "OK"])
 
     def test_latin_words_keep_spaces(self):
-        from ictrl import ocr
-        words = [word("iCtrl", 0, 50), word("test", 60, 40), word("confirm", 110, 70)]
-        self.assertEqual(ocr._join(words)["text"], "iCtrl test confirm")
+        from utsushite import ocr
+        words = [word("utsushite", 0, 50), word("test", 60, 40), word("confirm", 110, 70)]
+        self.assertEqual(ocr._join(words)["text"], "utsushite test confirm")
 
 
 class PairingIdentityTests(unittest.TestCase):
-    def test_device_info_is_ictrls_own(self):
+    def test_device_info_is_utsushites_own(self):
         import opack2
-        from ictrl import pairing
+        from utsushite import pairing
         import pymobiledevice3.remote.tunnel_service as tunnel
         with tempfile.TemporaryDirectory() as tmp:
             old_dir = pairing.PAIRING_DIR
@@ -40,7 +40,7 @@ class PairingIdentityTests(unittest.TestCase):
                     "mac": b"\x11\x22\x33\x44\x55\x66", "altIRK": b"x" * 16, "name": "host", "accountID": "a"}))
             finally:
                 pairing.PAIRING_DIR = old_dir
-        self.assertEqual(sent["name"], "iCtrl")
+        self.assertEqual(sent["name"], "utsushite")
         self.assertNotEqual(sent["remotepairing_serial_number"], "AAAAAAAAAAAA")
         self.assertNotEqual(sent["btAddr"], "11:22:33:44:55:66")
         self.assertEqual(sent["accountID"], "a")
@@ -49,7 +49,7 @@ class PairingIdentityTests(unittest.TestCase):
 @unittest.skipUnless(sys.platform == "win32", "Windows TCP table")
 class SameUserTests(unittest.TestCase):
     def test_own_connection_is_allowed(self):
-        from ictrl import localauth
+        from utsushite import localauth
         server = socket.socket()
         server.bind(("127.0.0.1", 0))
         server.listen(1)
@@ -64,7 +64,7 @@ class SameUserTests(unittest.TestCase):
             server.close()
 
     def test_system_process_is_another_user(self):
-        from ictrl import localauth
+        from utsushite import localauth
         self.assertNotEqual(localauth._sid_of(4), localauth._own())
 
 

@@ -6,7 +6,7 @@ from unittest import mock
 
 from starlette.websockets import WebSocketDisconnect
 
-from ictrl import server
+from utsushite import server
 
 
 class ViewerDiagnosticsTests(unittest.IsolatedAsyncioTestCase):
@@ -22,7 +22,7 @@ class ViewerDiagnosticsTests(unittest.IsolatedAsyncioTestCase):
             headers={"origin": "http://127.0.0.1:47800", "user-agent": "Mozilla/5.0"},
             accept=mock.AsyncMock(), send_text=mock.AsyncMock(),
             receive_text=mock.AsyncMock(side_effect=[json.dumps(message), WebSocketDisconnect()]))
-        with self.assertLogs("ictrl.server", level="INFO") as captured:
+        with self.assertLogs("utsushite.server", level="INFO") as captured:
             await route.endpoint(websocket)
         return next(record for record in captured.records if record.msg == "viewer %s")
 

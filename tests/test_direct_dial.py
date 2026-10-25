@@ -3,8 +3,8 @@ import types
 import unittest
 from unittest.mock import AsyncMock
 
-from ictrl.direct_dial import PytcpTransport
-from ictrl.session import DeviceSession, SessionError
+from utsushite.direct_dial import PytcpTransport
+from utsushite.session import DeviceSession, SessionError
 
 
 class FakeSocket:
@@ -63,7 +63,7 @@ class DirectDialTests(unittest.IsolatedAsyncioTestCase):
         sock.incoming.put_nowait(b"")
         await asyncio.wait_for(protocol.closed.wait(), 1)
         transport.abort()
-        with self.assertLogs("ictrl.direct_dial", level="WARNING") as captured:
+        with self.assertLogs("utsushite.direct_dial", level="WARNING") as captured:
             with self.assertRaisesRegex(ConnectionError, "peer EOF"):
                 transport.write(b"private-input")
             with self.assertRaises(ConnectionError):
@@ -77,7 +77,7 @@ class DirectDialTests(unittest.IsolatedAsyncioTestCase):
         transport, sock, protocol = self.make_transport()
         transport.write(b"already-queued")
         transport.close()
-        with self.assertLogs("ictrl.direct_dial", level="WARNING"):
+        with self.assertLogs("utsushite.direct_dial", level="WARNING"):
             with self.assertRaisesRegex(ConnectionError, "local close"):
                 transport.write(b"must-not-send")
         await asyncio.wait_for(protocol.closed.wait(), 1)
@@ -86,7 +86,7 @@ class DirectDialTests(unittest.IsolatedAsyncioTestCase):
     async def test_local_write_eof_rejects_further_write(self):
         transport, sock, _ = self.make_transport()
         transport.write_eof()
-        with self.assertLogs("ictrl.direct_dial", level="WARNING"):
+        with self.assertLogs("utsushite.direct_dial", level="WARNING"):
             with self.assertRaisesRegex(ConnectionError, "local write EOF"):
                 transport.write(b"must-not-send")
         self.assertEqual(sock.sent, [])
@@ -103,7 +103,7 @@ class DirectDialTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_receive_failure_logs_type_without_exception_message_or_address(self):
         transport, sock, protocol = self.make_transport()
-        with self.assertLogs("ictrl.direct_dial", level="WARNING") as captured:
+        with self.assertLogs("utsushite.direct_dial", level="WARNING") as captured:
             sock.incoming.put_nowait(OSError("private-input"))
             await asyncio.wait_for(protocol.closed.wait(), 1)
             with self.assertRaisesRegex(ConnectionError, "receive failed"):
@@ -116,7 +116,7 @@ class DirectDialTests(unittest.IsolatedAsyncioTestCase):
     async def test_send_failure_logs_type_without_exception_message_or_payload(self):
         transport, sock, protocol = self.make_transport()
         sock.send_error = BrokenPipeError("private-input")
-        with self.assertLogs("ictrl.direct_dial", level="WARNING") as captured:
+        with self.assertLogs("utsushite.direct_dial", level="WARNING") as captured:
             transport.write(b"private-input")
             await asyncio.wait_for(protocol.closed.wait(), 1)
             with self.assertRaisesRegex(ConnectionError, "send failed"):

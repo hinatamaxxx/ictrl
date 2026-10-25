@@ -11,25 +11,25 @@ ROOT = Path(__file__).resolve().parent.parent
 class PluginTests(unittest.TestCase):
     def test_manifests_point_at_the_entry_point(self):
         plugin = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text("utf-8"))
-        args = plugin["mcpServers"]["ictrl"]["args"]
-        self.assertTrue(any(a.endswith("plugin\\ictrl.cmd") for a in args))
+        args = plugin["mcpServers"]["utsushite"]["args"]
+        self.assertTrue(any(a.endswith("plugin\\utsushite.cmd") for a in args))
         hooks = json.loads((ROOT / "plugin" / "hooks.json").read_text("utf-8"))
-        self.assertIn("plugin/ictrl.cmd", hooks["hooks"]["Stop"][0]["hooks"][0]["command"])
-        self.assertTrue((ROOT / "plugin" / "ictrl.cmd").exists())
+        self.assertIn("plugin/utsushite.cmd", hooks["hooks"]["Stop"][0]["hooks"][0]["command"])
+        self.assertTrue((ROOT / "plugin" / "utsushite.cmd").exists())
         self.assertTrue((ROOT / "plugin" / "launch.py").exists())
 
     def test_codex_manifest_points_at_the_entry_point(self):
         plugin = json.loads((ROOT / ".codex-plugin" / "plugin.json").read_text("utf-8"))
-        mcp = json.loads((ROOT / plugin["mcpServers"]).read_text("utf-8"))["mcpServers"]["ictrl"]
+        mcp = json.loads((ROOT / plugin["mcpServers"]).read_text("utf-8"))["mcpServers"]["utsushite"]
         self.assertEqual(mcp["cwd"], ".")                     # relative to the plugin folder
-        self.assertIn("plugin\ictrl.cmd", mcp["args"])
+        self.assertIn(r"plugin\utsushite.cmd", mcp["args"])
         market = json.loads((ROOT / ".agents" / "plugins" / "marketplace.json").read_text("utf-8"))
         self.assertEqual(market["plugins"][0]["source"]["path"], "./")
         # Claude Code also reads a plugin's .mcp.json: none at the root.
         self.assertFalse((ROOT / ".mcp.json").exists())
 
     def test_entry_point_is_crlf_and_ascii(self):
-        data = (ROOT / "plugin" / "ictrl.cmd").read_bytes()
+        data = (ROOT / "plugin" / "utsushite.cmd").read_bytes()
         data.decode("ascii")                      # cmd reads it in the console's code page
         self.assertNotIn(b"\n", data.replace(b"\r\n", b""))
 

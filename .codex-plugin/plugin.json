@@ -1,16 +1,16 @@
 {
-  "name": "ictrl",
+  "name": "utsushite",
   "version": "0.1.0",
   "description": "Windows から iPhone を USB か同じネットワークで操作する（画面の要素・タップ・文字入力・スクリーンショット）。Windows 専用。",
   "author": {
     "name": "hinatamaxxx"
   },
-  "repository": "https://github.com/hinatamaxxx/ictrl",
+  "repository": "https://github.com/hinatamaxxx/utsushite",
   "license": "GPL-3.0-or-later",
   "keywords": ["iphone", "ios", "windows", "mirroring", "automation", "mcp"],
   "mcpServers": "./plugin/codex-mcp.json",
   "interface": {
-    "displayName": "iCtrl",
+    "displayName": "utsushite",
     "shortDescription": "Windows から iPhone を操作する",
     "longDescription": "iPhone の画面を Windows に映し、Codex が iPhone を操作できるようにします。USB と同じ Wi-Fi に対応。Windows 専用です。",
     "developerName": "hinatamaxxx",

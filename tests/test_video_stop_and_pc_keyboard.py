@@ -4,7 +4,7 @@ import contextlib
 import unittest
 from unittest import mock
 
-from ictrl.session import DeviceSession
+from utsushite.session import DeviceSession
 
 
 class VideoStopTests(unittest.IsolatedAsyncioTestCase):

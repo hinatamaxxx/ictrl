@@ -6,7 +6,7 @@ from unittest import mock
 
 from PIL import Image
 
-from ictrl.session import DeviceSession
+from utsushite.session import DeviceSession
 
 
 class PasscodeSessionTests(unittest.IsolatedAsyncioTestCase):

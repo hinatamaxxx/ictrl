@@ -1,11 +1,11 @@
 {
   "mcpServers": {
-    "ictrl": {
+    "utsushite": {
       "cwd": ".",
       "command": "cmd",
       "args": [
         "/c",
-        "plugin\\ictrl.cmd",
+        "plugin\\utsushite.cmd",
         "mcp"
       ],
       "env_vars": [

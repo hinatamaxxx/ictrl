@@ -8,8 +8,8 @@ from unittest import mock
 
 from starlette.requests import Request
 
-from ictrl import clipboard, manager, server
-from ictrl.session import DeviceSession
+from utsushite import clipboard, manager, server
+from utsushite.session import DeviceSession
 
 
 class ClipboardSettingsTests(unittest.IsolatedAsyncioTestCase):
@@ -83,7 +83,7 @@ class ClipboardSettingsTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_disabled_drops_already_queued_copy_without_reading_content(self):
         self.manager.settings["auto_copy_to_pc"] = False
-        with mock.patch("ictrl.clipboard.content_parts") as parts:
+        with mock.patch("utsushite.clipboard.content_parts") as parts:
             await self.manager._handle_iphone_copy(object())
             parts.assert_not_called()
         self.assertEqual(self.manager.clips.items, [])
@@ -97,7 +97,7 @@ class ClipboardSettingsTests(unittest.IsolatedAsyncioTestCase):
             await released.wait()
             return "example", None
 
-        with mock.patch("ictrl.manager.asyncio.to_thread", side_effect=conversion), \
+        with mock.patch("utsushite.manager.asyncio.to_thread", side_effect=conversion), \
                 mock.patch.object(self.manager, "copy_item_to_pc") as copy:
             task = asyncio.create_task(self.manager._handle_iphone_copy(object()))
             await asyncio.wait_for(started.wait(), 1)

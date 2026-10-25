@@ -1,11 +1,11 @@
 {
-  "name": "ictrl",
+  "name": "utsushite",
   "interface": {
-    "displayName": "iCtrl"
+    "displayName": "utsushite"
   },
   "plugins": [
     {
-      "name": "ictrl",
+      "name": "utsushite",
       "source": {
         "source": "local",
         "path": "./"

@@ -1,10 +1,10 @@
-"""Moving the files of earlier versions (~/.ictrl) to the Windows folders."""
+"""Moving the files of earlier versions (~/.ictrl, then the iCtrl folders) to the Windows folders."""
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
-from ictrl import paths
+from utsushite import paths
 
 
 class MigrateTests(unittest.TestCase):
@@ -34,6 +34,23 @@ class MigrateTests(unittest.TestCase):
             self.assertEqual((config / "settings.json").read_text(), "old")
             self.assertEqual(left, [])
             self.assertTrue((local / paths.MARKER).exists())
+
+    def test_the_ictrl_folders_move_to_utsushite(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            old_config, old_local = Path(tmp, "roaming", "iCtrl"), Path(tmp, "local", "iCtrl")
+            config, local = Path(tmp, "roaming", "utsushite"), Path(tmp, "local", "utsushite")
+            (old_local / "pairing").mkdir(parents=True)
+            (old_local / "pairing" / "identity.json").write_text("{}")
+            old_config.mkdir(parents=True)
+            (old_config / "settings.json").write_text('{"language": "en"}')
+            renamed = ((old_config, config), (old_local, local))
+            with mock.patch.multiple(paths, RENAMED_FROM=renamed, _home=None):
+                left = paths.migrate_renamed()
+            self.assertEqual((config / "settings.json").read_text(), '{"language": "en"}')
+            self.assertTrue((local / "pairing" / "identity.json").exists())
+            self.assertFalse(old_config.exists())
+            self.assertFalse(old_local.exists())
+            self.assertEqual(left, [])
 
     def test_folders_are_merged(self):
         with tempfile.TemporaryDirectory() as tmp:

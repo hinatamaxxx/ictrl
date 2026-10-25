@@ -5,9 +5,9 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from ictrl import passcode
-from ictrl.session import DeviceSession, SessionError
-from ictrl.video import StreamConfig
+from utsushite import passcode
+from utsushite.session import DeviceSession, SessionError
+from utsushite.video import StreamConfig
 
 
 SECRET = "975310"
@@ -709,7 +709,7 @@ class AutomaticTests(unittest.IsolatedAsyncioTestCase):
         await self.assert_wda_startup_with_real_watcher(call_mode=True)
 
     async def assert_wda_startup_with_real_watcher(self, call_mode):
-        from ictrl.wda import WdaAgent
+        from utsushite.wda import WdaAgent
 
         if call_mode:
             self.session.info.video_paused = "call"

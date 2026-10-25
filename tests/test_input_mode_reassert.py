@@ -4,8 +4,8 @@ mode the PC asked for (Windows "A", iPhone typed Japanese)."""
 import unittest
 from unittest import mock
 
-from ictrl import keys
-from ictrl.session import DeviceSession
+from utsushite import keys
+from utsushite.session import DeviceSession
 
 EISU = keys.usage_for_name("eisu")
 KANA = keys.usage_for_name("kana")

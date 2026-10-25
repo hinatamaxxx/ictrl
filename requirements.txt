@@ -1,6 +1,6 @@
-# iCtrl's runtime packages, exact versions, installed with --no-deps by setup.ps1 / plugin/launch.py.
+# utsushite's runtime packages, exact versions, installed with --no-deps by setup.ps1 / plugin/launch.py.
 # pymobiledevice3 is installed without its own dependency list: that list pulls in
-# IPython, PyAV, FastAPI and other tools iCtrl does not use (about 130 MB).
+# IPython, PyAV, FastAPI and other tools utsushite does not use (about 130 MB).
 # lzfse, pylzss and hexdump come from wheels/ (built by tools/build_wheels.py).
 # Regenerate after an upgrade: install in a fresh venv, run the tests, pip freeze,
 # then add the hashes with tools/hash_requirements.py (installs check every file).

@@ -8,8 +8,8 @@ from unittest import mock
 
 from starlette.requests import Request
 
-from ictrl import manager, server
-from ictrl.session import DeviceSession, SessionError
+from utsushite import manager, server
+from utsushite.session import DeviceSession, SessionError
 
 
 class ShortcutSettingsTests(unittest.IsolatedAsyncioTestCase):

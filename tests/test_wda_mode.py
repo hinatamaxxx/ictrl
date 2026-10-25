@@ -3,7 +3,7 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from ictrl import screentext, wda
+from utsushite import screentext, wda
 
 
 def fake_session(mode):
@@ -29,7 +29,7 @@ class OcrElementTests(unittest.IsolatedAsyncioTestCase):
     async def run_ocr(self, texts):
         session = SimpleNamespace(screen_png=mock.AsyncMock(return_value=(b"png", 100, 200)))
         lines = [{"text": t, "x": 10, "y": 20 * i, "w": 40, "h": 10} for i, t in enumerate(texts)]
-        with mock.patch("ictrl.ocr.recognize", mock.AsyncMock(return_value=lines)):
+        with mock.patch("utsushite.ocr.recognize", mock.AsyncMock(return_value=lines)):
             return await screentext.ocr_elements(session)
 
     async def test_text_becomes_elements(self):

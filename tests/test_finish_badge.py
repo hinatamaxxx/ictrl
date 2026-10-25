@@ -1,4 +1,4 @@
-"""An agent's finish (ictrl_finish, the Stop hook at the end of a response)
+"""An agent's finish (utsushite_finish, the Stop hook at the end of a response)
 does not show "AI が操作中"; an ordinary agent request does."""
 import types
 import unittest
@@ -6,7 +6,7 @@ from unittest import mock
 
 from starlette.requests import Request
 
-from ictrl import server
+from utsushite import server
 
 
 def make_request(path):

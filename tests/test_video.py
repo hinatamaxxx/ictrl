@@ -5,7 +5,7 @@ import struct
 import unittest
 from pathlib import Path
 
-from ictrl import video
+from utsushite import video
 
 FIXTURE = json.loads((Path(__file__).parent / "fixtures" / "config.json").read_text())
 
@@ -71,9 +71,9 @@ class SpsTests(unittest.TestCase):
         lag = video.DeviceLag()
         self.assertEqual(lag.observe(100.0, 0), 0.0)
         self.assertAlmostEqual(lag.observe(101.0, 24000), 0.0)
-        with self.assertLogs("ictrl.video", "INFO"):
+        with self.assertLogs("utsushite.video", "INFO"):
             self.assertAlmostEqual(lag.observe(104.0, 48000), 2.0)
-        with self.assertLogs("ictrl.video", "INFO"):
+        with self.assertLogs("utsushite.video", "INFO"):
             self.assertAlmostEqual(lag.observe(103.05, 72000), 0.05, places=3)
 
 class AssemblerTests(unittest.TestCase):

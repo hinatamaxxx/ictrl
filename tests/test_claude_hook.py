@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from ictrl.__main__ import install_claude_hook, remove_claude_hook
+from utsushite.__main__ import install_claude_hook, remove_claude_hook
 
 
 class ClaudeHookTests(unittest.TestCase):
@@ -17,7 +17,7 @@ class ClaudeHookTests(unittest.TestCase):
             data = json.loads(path.read_text("utf-8"))
         commands = [h["command"] for e in data["hooks"]["Stop"] for h in e["hooks"]]
         self.assertEqual(data["model"], "opus")
-        self.assertEqual(sum("ictrl stop-hook" in c for c in commands), 1)
+        self.assertEqual(sum("utsushite stop-hook" in c for c in commands), 1)
         self.assertIn("x", commands)
 
     def test_creates_settings(self):

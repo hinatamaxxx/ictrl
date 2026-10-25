@@ -1,4 +1,4 @@
-"""The MCP process starts the iCtrl server for the iCtrl page only (starter.py).
+"""The MCP process starts the utsushite server for the utsushite page only (starter.py).
 
 The handler is driven with an in-memory request: loopback TCP on a PC with a
 localhost-filtering proxy (AdGuard) resets some connections by itself."""
@@ -6,7 +6,7 @@ import io
 import socket
 import unittest
 
-from ictrl import starter
+from utsushite import starter
 
 PORT = 47800
 
@@ -37,7 +37,7 @@ def ask(origin, path="/start", host=f"127.0.0.1:{PORT + 1}", start=lambda: None)
 
 
 class StarterTests(unittest.TestCase):
-    def test_the_ictrl_page_starts_the_server(self):
+    def test_the_utsushite_page_starts_the_server(self):
         started = []
         self.assertEqual(ask(f"http://127.0.0.1:{PORT}", start=lambda: started.append(True)), 204)
         self.assertEqual(ask(f"http://localhost:{PORT}", start=lambda: started.append(True)), 204)

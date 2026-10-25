@@ -6,7 +6,7 @@ import unittest
 from collections import defaultdict
 from pathlib import Path
 
-I18N = Path(__file__).resolve().parent.parent / "ictrl" / "ui" / "i18n.js"
+I18N = Path(__file__).resolve().parent.parent / "utsushite" / "ui" / "i18n.js"
 STRING = r'"(?:[^"\\]|\\.)*"'
 
 

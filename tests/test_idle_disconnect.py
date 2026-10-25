@@ -1,12 +1,12 @@
-"""Nothing keeps reaching the phone when nobody uses it: no iCtrl window open
+"""Nothing keeps reaching the phone when nobody uses it: no utsushite window open
 and no agent working closes the connection."""
 import asyncio
 import types
 import unittest
 from unittest import mock
 
-from ictrl import manager as manager_module
-from ictrl.manager import Manager
+from utsushite import manager as manager_module
+from utsushite.manager import Manager
 
 
 class IdleDisconnectTests(unittest.IsolatedAsyncioTestCase):
@@ -133,7 +133,7 @@ class IdleDisconnectTests(unittest.IsolatedAsyncioTestCase):
         stop = self.with_automation(m)
         with mock.patch.object(manager_module, "IDLE_AFTER_AGENT", 0.01):
             m.window_opened()                         # the window keeps the connection
-            m.agent_started(); m.agent_ended()        # no ictrl_finish, no Stop hook
+            m.agent_started(); m.agent_ended()        # no utsushite_finish, no Stop hook
             await asyncio.sleep(0.05)
         stop.assert_awaited_once()
         m.disconnect.assert_not_awaited()
@@ -162,14 +162,14 @@ class IdleDisconnectTests(unittest.IsolatedAsyncioTestCase):
         m.app_window_closed()
         return ended
 
-    async def test_closing_the_app_window_ends_iCtrl_at_once(self):
+    async def test_closing_the_app_window_ends_utsushite_at_once(self):
         m = self.make()
         ended = self.app_closing(m)
         await self.settle()
         m.disconnect.assert_awaited_once()
         self.assertEqual(ended, [True])
 
-    async def test_another_page_keeps_iCtrl(self):
+    async def test_another_page_keeps_utsushite(self):
         m = self.make()
         m.page_opened()                               # e.g. Claude's browser pane
         ended = self.app_closing(m)
@@ -177,7 +177,7 @@ class IdleDisconnectTests(unittest.IsolatedAsyncioTestCase):
         m.disconnect.assert_not_awaited()
         self.assertEqual(ended, [])
 
-    async def test_an_agent_at_work_keeps_iCtrl(self):
+    async def test_an_agent_at_work_keeps_utsushite(self):
         m = self.make()
         m.agent_started()
         ended = self.app_closing(m)

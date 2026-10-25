@@ -2,7 +2,7 @@
 import unittest
 from unittest import mock
 
-from ictrl.session import DeviceSession, SessionError
+from utsushite.session import DeviceSession, SessionError
 
 
 class LockOnlyTests(unittest.IsolatedAsyncioTestCase):

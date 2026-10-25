@@ -2,7 +2,7 @@
 import unittest
 from unittest import mock
 
-from ictrl.manager import Manager
+from utsushite.manager import Manager
 
 
 class LanguageSettingTests(unittest.IsolatedAsyncioTestCase):

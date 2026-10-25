@@ -4,7 +4,7 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from ictrl import xctest_prompt
+from utsushite import xctest_prompt
 
 
 HEAD = '"XCTest" を使うために\niPhoneのパスコードを入力'
