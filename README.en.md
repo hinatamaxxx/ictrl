@@ -4,8 +4,6 @@
 
 iCtrl shows your iPhone's screen on a Windows PC and lets you use it with the mouse and keyboard, over a USB cable or the same Wi-Fi network. You can also ask Claude, the AI assistant, to operate the iPhone for you ("open Settings on the iPhone").
 
-iCtrl is an unofficial tool, not affiliated with Apple.
-
 ## What it does
 
 - Shows the iPhone's screen on the PC (no sound)
@@ -56,17 +54,26 @@ While this repository is private, the plugin installs only on PCs signed in to a
 
 ### Install as an app (without Claude)
 
-This installs iCtrl as an ordinary Windows app that you open from the Start menu. Its screen opens in its own window.
+This installs iCtrl as an ordinary Windows app that you open from the Start menu. Its screen opens in its own window. The first time only, prepare three things.
 
-1. **Install Python.** Download the latest Python from [python.org](https://www.python.org/downloads/) and install it. On the first screen of the installer, check "Add python.exe to PATH". The Microsoft Store Python does not work.
-2. **Download iCtrl.** On this repository's page, choose "Download ZIP" from the green "Code" button and extract the ZIP. Put the extracted folder where it can stay, for example `iCtrl` in your Documents (the program runs from there).
-3. **Set it up.** Open the extracted folder in File Explorer, type `powershell` in the address bar and press Enter. Paste this line into the window that opens and press Enter. It takes a few minutes.
+1. **Install Python.** iCtrl runs on Python, so install it first.
+   1. On [python.org's download page](https://www.python.org/downloads/), press "Download Python" to get the installer.
+   2. Open the installer, check "Add python.exe to PATH" at the bottom of the first screen, then press "Install Now".
+   3. The Microsoft Store Python does not work (settings and pairing records would end up in a separate place).
+2. **Download iCtrl.**
+   1. On this repository's page, press the green "Code" button and choose "Download ZIP".
+   2. Right-click the downloaded ZIP and choose "Extract All".
+   3. Put the extracted folder somewhere it can stay, for example in Documents, and name it `iCtrl`. The program runs from there, so do not move it later.
+3. **Set it up.**
+   1. Open the `iCtrl` folder in File Explorer.
+   2. Click the address bar (where the folder's location is shown), type `powershell` and press Enter. A dark window (PowerShell) opens.
+   3. Paste this line and press Enter. It downloads what it needs, which takes a few minutes. It is done when it shows "OK: iCtrl をインストールしました".
 
    ```powershell
    powershell -ExecutionPolicy Bypass -File setup.ps1 -Shortcut
    ```
 
-4. **Open it.** Open "iCtrl" from the Start menu.
+This adds "iCtrl" to the Start menu. See [Start and stop](#start-and-stop) for how to open it.
 
 Add ` -Desktop` to the end of the line in step 3 for a desktop icon, or ` -Codex` to operate the iPhone from Codex. Or give an AI agent this repository's URL and ask it to install iCtrl: it follows [AGENTS.md](AGENTS.md). Details are in [the technical notes, "セットアップ"](docs/technical.md#セットアップclaude-のプラグインを使わない場合) (Japanese).
 
@@ -79,9 +86,20 @@ Add ` -Desktop` to the end of the line in step 3 for a desktop icon, or ` -Codex
 
 This also prepares the Wi-Fi connection. From then on, if the PC and the iPhone are on the same Wi-Fi network, press "Wi-Fi で接続" (Connect over Wi-Fi), with no cable.
 
+## Start and stop
+
+iCtrl is made of a part that runs in the background (the server) and the screen that shows and controls the iPhone. You never need to start or stop the server yourself.
+
+| Used as | Start | Stop |
+|---|---|---|
+| Claude plugin | Ask Claude to "open the iCtrl screen", or to do something on the iPhone: the server starts on its own. The screen appears in the browser on the right side of the Claude app | It ends on its own once the screen is closed and Claude no longer uses iCtrl |
+| App | Open "iCtrl" from the Start menu: the server starts on its own and the iCtrl window opens | It ends on its own when you close the window |
+
+Either way, the server exits by itself after 1 minute with no iPhone connected. While only the server runs, no icon appears on the taskbar or in the notification area. If the iPhone is still connected when you close the iCtrl window, the connection closes after 30 seconds and the server then exits.
+
 ## Everyday use
 
-1. Open the iCtrl screen: with the plugin, ask Claude to "open the iCtrl screen"; with the app, open "iCtrl" from the Start menu.
+1. Open the iCtrl screen (see [Start and stop](#start-and-stop)).
 2. Choose "USB" or "Wi-Fi" at the top of the screen to connect.
 3. When you are done, press "切断" (Disconnect) or close the screen.
 
@@ -110,7 +128,7 @@ On the iPhone, open the Settings app and show the Wi-Fi screen.
 
 - While Claude works, the iCtrl screen shows "AI が操作中" (AI at work) at the top, and a purple dot where Claude touches.
 - Press the ✕ on "AI が操作中" to stop it at once. Use the mouse to take over at any time.
-- Claude never enters the iPhone's passcode. If the iPhone locks, unlock it yourself.
+- Claude never enters the iPhone's passcode.
 
 ### Install the helper app (WebDriverAgent)
 

@@ -59,24 +59,26 @@ def main(argv: list[str]) -> None:
         ipa_sha = hashlib.sha256(ipa.read_bytes()).hexdigest()
         notes = Path(tmp) / "notes.md"
         notes.write_text(
-            f"iCtrl WDA: an unsigned IPA of WebDriverAgent for iCtrl's element-based operation.\n\n"
-            f"- Source: Appium WebDriverAgent {release['tag_name']}, `{WDA_ASSET}` "
-            f"(sha256 `{digest}`), unmodified except the bundle ID (`com.ictrl.wda`) and the display name (`iCtrl WDA`).\n"
-            f"- `iCtrl-WDA.ipa` sha256: `{ipa_sha}`\n"
-            f"- Sign and install it with your own Apple ID (AltStore Classic, Sideloadly). See the README.\n\n"
+            f"iCtrl の補助アプリ「iCtrl WDA」（WebDriverAgent）の、署名していない IPA です。"
+            f"iPhone に入れておくと、iCtrl が画面のボタンや文字を一覧で読み取れるようになります。\n\n"
+            f"- 入れ方: 自分の Apple ID で署名して入れます（AltStore Classic、Sideloadly など）。"
+            f"手順は README の「補助アプリ（WebDriverAgent）を入れる」にあります。\n"
+            f"- 元: Appium の WebDriverAgent {release['tag_name']} の `{WDA_ASSET}`（sha256 `{digest}`）。"
+            f"変えたのは、アプリの ID（`com.ictrl.wda`）と表示名（`iCtrl WDA`）だけです。\n"
+            f"- `iCtrl-WDA.ipa` の sha256: `{ipa_sha}`\n\n"
             f"WebDriverAgent: Copyright (c) 2015-present, Facebook, Inc. All rights reserved. "
-            f"BSD-3-Clause; the license text is `WebDriverAgent-LICENSE.txt` in this release. "
-            f"iCtrl is not affiliated with or endorsed by Facebook (Meta) or Appium.\n",
+            f"ライセンスは BSD-3-Clause で、本文はこのリリースの `WebDriverAgent-LICENSE.txt` にあります。"
+            f"iCtrl は Facebook（Meta）および Appium とは関係がなく、承認も受けていません。\n"
             "utf-8")
         exists = subprocess.run(["gh", "release", "view", TAG, *target], cwd=ROOT, capture_output=True).returncode == 0
         if exists:
             subprocess.run(["gh", "release", "edit", TAG, *target, "--notes-file", str(notes),
-                            "--title", f"iCtrl WDA ({release['tag_name']})"], cwd=ROOT, check=True)
+                            "--title", f"iCtrl WDA（WebDriverAgent {release['tag_name']}）"], cwd=ROOT, check=True)
             subprocess.run(["gh", "release", "upload", TAG, *target, str(ipa), str(LICENSE), "--clobber"],
                            cwd=ROOT, check=True)
         else:
             subprocess.run(["gh", "release", "create", TAG, *target, str(ipa), str(LICENSE),
-                            "--title", f"iCtrl WDA ({release['tag_name']})", "--notes-file", str(notes),
+                            "--title", f"iCtrl WDA（WebDriverAgent {release['tag_name']}）", "--notes-file", str(notes),
                             "--latest=false"],
                            cwd=ROOT, check=True)
     print(f"OK: {TAG} に iCtrl-WDA.ipa（Appium {release['tag_name']}）を置きました")
