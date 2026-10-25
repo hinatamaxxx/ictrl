@@ -111,6 +111,45 @@ class IdleDisconnectTests(unittest.IsolatedAsyncioTestCase):
         m.agent_started()
         self.assertEqual(m.status()["agent_running"], 1)
 
+    def app_closing(self, m):
+        ended = []
+        m.on_unused = lambda: ended.append(True)
+        m.page_opened()
+        m.page_closed()                               # the app window's page went away
+        m.app_window_closed()
+        return ended
+
+    async def test_closing_the_app_window_ends_iCtrl_at_once(self):
+        m = self.make()
+        ended = self.app_closing(m)
+        await self.settle()
+        m.disconnect.assert_awaited_once()
+        self.assertEqual(ended, [True])
+
+    async def test_another_page_keeps_iCtrl(self):
+        m = self.make()
+        m.page_opened()                               # e.g. Claude's browser pane
+        ended = self.app_closing(m)
+        await self.settle()
+        m.disconnect.assert_not_awaited()
+        self.assertEqual(ended, [])
+
+    async def test_an_agent_at_work_keeps_iCtrl(self):
+        m = self.make()
+        m.agent_started()
+        ended = self.app_closing(m)
+        await self.settle()
+        m.disconnect.assert_not_awaited()
+        self.assertEqual(ended, [])
+
+    async def test_closing_the_window_respects_the_setting(self):
+        m = self.make()
+        m.settings["auto_disconnect"] = False
+        ended = self.app_closing(m)
+        await self.settle()
+        m.disconnect.assert_not_awaited()
+        self.assertEqual(ended, [])
+
     async def test_the_setting_turns_it_off(self):
         m = self.make()
         m.settings["auto_disconnect"] = False

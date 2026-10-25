@@ -418,6 +418,28 @@ class Manager:
         self.pages = max(0, self.pages - 1)
         self.arm_exit()
 
+    def app_window_closed(self) -> None:
+        """The app window was closed (it cannot reload, so this is not a
+        passing gap). With no other page and no agent at work, close the
+        connection and end the server now instead of after the idle delays."""
+        if self.pages or self.agent_running or self.on_unused is None:
+            return
+        if not self.settings.get("auto_disconnect", True):
+            return
+        self._cancel_idle()
+        self._cancel_exit()
+
+        async def end_now():
+            if self._connected():
+                log.info("the iCtrl window closed: closing the iPhone connection")
+                await self.disconnect()
+            if self.pages or self.agent_running:
+                return
+            log.info("the iCtrl window closed: ending the server")
+            self.on_unused()
+
+        asyncio.get_running_loop().create_task(end_now())
+
     def _connected(self) -> bool:
         return self.session is not None and self.session.info.state in ("ready", "connecting")
 

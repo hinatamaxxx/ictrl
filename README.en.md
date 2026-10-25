@@ -93,9 +93,41 @@ iCtrl is made of a part that runs in the background (the server) and the screen 
 | Used as | Start | Stop |
 |---|---|---|
 | Claude plugin | Ask Claude to "open the iCtrl screen", or to do something on the iPhone: the server starts on its own. The screen appears in the browser on the right side of the Claude app | It ends on its own once the screen is closed and Claude no longer uses iCtrl |
-| App | Open "iCtrl" from the Start menu: the server starts on its own and the iCtrl window opens | It ends on its own when you close the window |
+| App | Open "iCtrl" from the Start menu: the server starts on its own and the iCtrl window opens | Closing the window closes the iPhone connection and ends it at once. If Claude or another AI is still using iCtrl, or another screen (such as Claude's browser) is open, it keeps running until that use ends |
 
-Either way, the server exits by itself after 1 minute with no iPhone connected. While only the server runs, no icon appears on the taskbar or in the notification area. If the iPhone is still connected when you close the iCtrl window, the connection closes after 30 seconds and the server then exits.
+With the plugin, the iPhone connection closes 30 seconds after the screen is closed, and the server exits 1 minute later; the short wait keeps a screen that was only hidden for a moment from losing its connection. Either way, the server exits by itself after 1 minute with no screen, no iPhone connection and no AI at work. While only the server runs, no icon appears on the taskbar or in the notification area.
+
+### Start the server by hand (for advanced users)
+
+You do not normally need this, but the server can be started with a command. Open PowerShell in the iCtrl folder and run one of these.
+
+Installed as an app:
+
+- Start only the server in the background and print the screen's URL (`http://127.0.0.1:47800/`)
+
+  ```powershell
+  .venv\Scripts\python.exe -m ictrl url
+  ```
+
+- Run the server in the foreground (its log appears there; Ctrl+C stops it)
+
+  ```powershell
+  .venv\Scripts\python.exe -m ictrl serve
+  ```
+
+- Start the server and open the iCtrl window (the same as "iCtrl" in the Start menu)
+
+  ```powershell
+  .\iCtrl.cmd
+  ```
+
+Installed as a Claude plugin, use the entry point in the plugin folder. Replace `<version>` with the newest version folder's name in `%USERPROFILE%\.claude\plugins\cache\ictrl\ictrl\`.
+
+```powershell
+& "$env:USERPROFILE\.claude\plugins\cache\ictrl\ictrl\<version>\plugin\ictrl.cmd" url
+```
+
+The screen also works in an ordinary browser at `http://127.0.0.1:47800/`. A server started by hand also exits by itself after 1 minute unused. There is no command to stop it: stop a foreground server with Ctrl+C; otherwise wait for it to exit, or end `pythonw.exe` in Task Manager.
 
 ## Everyday use
 

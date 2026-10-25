@@ -808,6 +808,11 @@ def create_app(port: int) -> Starlette:
         await websocket.send_text(json.dumps({"t": "hello", "build": ui_build()}))
         log.info("viewer connected")
         window = not from_agent(websocket.headers)       # an iCtrl page, not a script
+        # The app window (iCtrlWindow.exe marks its user agent) cannot reload,
+        # so its page closing means the window closed; the page itself says
+        # when it reloads for a newer GUI.
+        app_window = "iCtrlWindow" in websocket.headers.get("user-agent", "")
+        reloading = False
         shown = False       # this page is on screen (it asks for video exactly then)
         if window:
             manager.page_opened()
@@ -846,8 +851,11 @@ def create_app(port: int) -> Starlette:
         agent_socket = from_agent(websocket.headers)
 
         async def handle(message: dict):
-            nonlocal video_task, shown
+            nonlocal video_task, shown, reloading
             t = message.get("t")
+            if t == "reloading":
+                reloading = True
+                return
             if t == "video":
                 # A page asks for video while it is on screen and stops when
                 # hidden (minimized, a background tab): that is "in use".
@@ -939,6 +947,8 @@ def create_app(port: int) -> Starlette:
                 manager.window_closed()
             if window:
                 manager.page_closed()
+            if app_window and not reloading:
+                manager.app_window_closed()
             manager.unlisten(events)
             for task in (status_task, watcher, video_task, *tasks):
                 if task:

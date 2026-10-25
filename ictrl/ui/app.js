@@ -471,7 +471,10 @@ function connectSocket() {
       }
     } else if (msg.t === "hello") {
       // The server was updated with a newer GUI: load it.
-      if (state.build && state.build !== msg.build) return location.reload();
+      if (state.build && state.build !== msg.build) {
+        send({ t: "reloading" });     // not a closed window (see the server's app_window)
+        return location.reload();
+      }
       state.build = msg.build;
     } else if (msg.t === "config") {
       configure(msg);

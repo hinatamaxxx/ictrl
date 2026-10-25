@@ -135,6 +135,8 @@ class MainForm : Form
         s.IsGeneralAutofillEnabled = false;
         s.IsPasswordAutosaveEnabled = false;
         s.IsBuiltInErrorPageEnabled = true;
+        // Tells the server this page is the app window: closing it ends iCtrl.
+        s.UserAgent = s.UserAgent + " iCtrlWindow";
         core.Profile.PreferredColorScheme =
             Native.LightTheme() ? CoreWebView2PreferredColorScheme.Light : CoreWebView2PreferredColorScheme.Dark;
         core.DocumentTitleChanged += delegate { Text = string.IsNullOrEmpty(core.DocumentTitle) ? "iCtrl" : core.DocumentTitle; };
