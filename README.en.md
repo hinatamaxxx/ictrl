@@ -132,7 +132,7 @@ On the iPhone, open the Settings app and show the Wi-Fi screen.
 
 ### Install the helper app (WebDriverAgent)
 
-Claude operates the iPhone by reading the buttons and text on its screen. With the helper app "iCtrl WDA" (WebDriverAgent) on the iPhone, Claude reads the kind and position of each button and text as a list, and presses them by name without looking at images. iCtrl works without it, but then it reads the screen's text from the image, and icons without text cannot be read.
+Claude operates the iPhone by reading the buttons and text on its screen. With the helper app "iCtrl WDA" (WebDriverAgent) on the iPhone, Claude reads the kind and position of each button and text as a list, and presses them by name without looking at images. iCtrl also works without it (see [How Claude reads the screen](#how-claude-reads-the-screen)).
 
 The helper app is distributed unsigned. Sign it with your own Apple ID when you install it: Apple requires this, and iCtrl cannot skip it.
 
@@ -157,6 +157,19 @@ WebDriverAgent (WDA) is an app widely used by iPhone test automation tools such 
 - **How it runs**: iCtrl starts it only while Claude reads screen elements and stops it afterwards, because WDA's port (8100) has no authentication and accepts connections from other devices on the network.
 
 If a WDA installed by another tool is already on the iPhone, iCtrl can use it. With both, iCtrl uses iCtrl WDA.
+
+### How Claude reads the screen
+
+How Claude reads the iPhone's screen depends on the helper app and on what is on the screen.
+
+- **With the helper app**: Claude reads the buttons and text on the screen as a list and presses them by name. No images are sent, so it is fast and uses fewer of Claude's tokens.
+- **Without the helper app**: the text is read from a picture of the screen with Windows' text recognition. Icons without text cannot be read that way, so Claude looks at the screen image to find where to press.
+
+Even with the helper app, Claude looks at the screen image when:
+
+- What it wants to press is not in the list, such as an icon without text, or an app that draws its screen as a picture (games, maps, drawing apps).
+- It must judge what an image shows, such as a photo or a map.
+- The helper app could not start (its signature expired, it is not trusted, and so on). Reading then switches to text recognition.
 
 ## A shortcut for faster copying
 
