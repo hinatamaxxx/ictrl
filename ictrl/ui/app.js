@@ -1,5 +1,5 @@
 // iCtrl viewer: WebCodecs (hardware) HEVC decode, touch/keyboard input, controls.
-import { LANG, SETTING, adopt, t, translatePage } from "./i18n.js";
+import { LANG, SETTING, adopt, fromServer, t, translatePage } from "./i18n.js";
 
 translatePage();
 const $ = (s) => document.querySelector(s);
@@ -37,6 +37,7 @@ const device = $("#device");
 // action: optional { label, run, detail, image } — a button, a smaller second
 // line and a thumbnail on the left.
 function toast(msg, bad = false, action = null) {
+  msg = fromServer(msg);
   const t = $("#toast");
   t.textContent = "";
   if (action) {
@@ -200,7 +201,7 @@ function renderStatus() {
   $$(".empty-actions .btn").forEach((b) => (b.disabled = s.state === "connecting"));
   const err = $("#errorText");
   err.hidden = !s.error || live;
-  err.textContent = s.error || "";
+  err.textContent = fromServer(s.error) || "";
   $("#emptyTitle").textContent = s.state === "failed" ? t("接続が切れました") :
     paused === "off" ? t("画面を映していません") :
     paused === "camera" ? t("カメラの使用中は画面を映していません") :
@@ -906,7 +907,7 @@ async function pasteFromPc() {
     const r = await api("/api/clipboard/push", {});
     if (!r.ok) return toast(r.error, true);
     command({ t: "key", key: "v", modifiers: ["cmd"] });
-  } catch (e) { toast(t("貼り付けできませんでした: ") + e.message, true); }
+  } catch (e) { toast(t("貼り付けできませんでした: ") + fromServer(e.message), true); }
 }
 
 async function copyToPc() {

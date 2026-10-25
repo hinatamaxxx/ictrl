@@ -29,6 +29,28 @@ export function t(ja, vars) {
   return text;
 }
 
+// Messages from the server (errors, reasons) stay Japanese there, because the
+// AI reads the same text through MCP; the page shows them in its language.
+// "{x}" in a key matches any text, carried into the English.
+let patterns = null;
+export function fromServer(message) {
+  if (LANG !== "en" || typeof message !== "string") return message;
+  if (SERVER[message] !== undefined) return SERVER[message];
+  patterns ??= Object.entries(SERVER).filter(([ja]) => ja.includes("{")).map(([ja, en]) => {
+    const names = [];
+    const source = ja.split(/\{(\w+)\}/).map((part, i) => {
+      if (i % 2) { names.push(part); return "(.*?)"; }
+      return part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }).join("");
+    return { re: new RegExp(`^${source}$`, "s"), names, en };
+  });
+  for (const { re, names, en } of patterns) {
+    const m = message.match(re);
+    if (m) return names.reduce((text, name, i) => text.replace(`{${name}}`, m[i + 1]), en);
+  }
+  return message;
+}
+
 // index.html: text nodes and labels are translated by their exact Japanese
 // text; paragraphs with markup inside carry data-i18n and are replaced whole.
 export function translatePage(root = document.body) {
@@ -49,6 +71,112 @@ export function translatePage(root = document.body) {
     if (EN_HTML[el.dataset.i18n]) el.innerHTML = EN_HTML[el.dataset.i18n];
   }
 }
+
+const SERVER = {
+  // connecting (manager.py, session.py, host.py)
+  "USB でつながった iPhone がありません。ケーブルを確かめてください": "No iPhone is connected over USB. Check the cable",
+  "Wi-Fi 操作の準備ができていません。一度 USB で接続すると自動で準備されます": "Wi-Fi is not set up yet. Connect once over USB and it is set up automatically",
+  "Wi-Fi で iPhone を探すには Apple Devices アプリ（または iTunes）が必要です": "Finding the iPhone over Wi-Fi needs the Apple Devices app (or iTunes)",
+  "Wi-Fi で iPhone が見つかりません。同じネットワークにあるか、iPhone の画面が点いているか確かめてください":
+    "No iPhone found over Wi-Fi. Check that it is on the same network and that its screen is on",
+  "USBで接続されたiPhoneがありません": "No iPhone is connected over USB",
+  "Wi-Fiで見えるiPhoneがありません": "No iPhone is visible over Wi-Fi",
+  "接続を中止しました": "Connection cancelled",
+  "iPhoneに接続されていません（先に接続してください）": "Not connected to an iPhone (connect first)",
+  "iPhoneに接続されていません": "Not connected to an iPhone",
+  "このiPhoneは別のプロセスが操作中です。他の操作アプリやテストを終了してから接続してください。":
+    "Another process is controlling this iPhone. Quit other control apps or tests, then connect.",
+  "iPhone との接続が切れました。ケーブルが抜けていないか確かめて、もう一度接続してください":
+    "The connection to the iPhone was lost. Check that the cable is plugged in, then connect again",
+  "iPhone との接続が切れました。iPhone が同じ Wi-Fi にあるか、画面が点いているか確かめて、もう一度接続してください":
+    "The connection to the iPhone was lost. Check that it is on the same Wi-Fi and that its screen is on, then connect again",
+  "iPhone に接続できませんでした。もう一度接続してください（続くときはケーブルを挿し直すか、iPhone を再起動してください）":
+    "Could not connect to the iPhone. Connect again (if it keeps happening, replug the cable or restart the iPhone)",
+  "iPhoneのデベロッパモードを有効にしてください（設定 > プライバシーとセキュリティ）":
+    "Turn on Developer Mode on the iPhone (Settings > Privacy & Security)",
+  "iCtrl の部品の版が合わないため接続できません。setup.ps1 をもう一度実行してください":
+    "Cannot connect because iCtrl's components do not match. Run setup.ps1 again",
+  "iPhone の画面を操作する準備ができませんでした。もう一度接続してください": "Could not get ready to control the iPhone's screen. Connect again",
+  "USB でつながった iPhone が見つかりません。ケーブルと、Apple Devices アプリが入っているかを確かめてください":
+    "No iPhone found over USB. Check the cable and that the Apple Devices app is installed",
+  "iPhone から応答がありません。ケーブルを挿し直して、もう一度接続してください": "The iPhone does not respond. Replug the cable and connect again",
+  "iPhone で「このコンピュータを信頼」を許可してください（{error}）": "On the iPhone, allow \"Trust This Computer\" ({error})",
+  "この PC はまだ iPhone に信頼されていません。USB でつなぎ、iPhone で「信頼」を押してください":
+    "The iPhone does not trust this PC yet. Connect over USB and tap \"Trust\" on the iPhone",
+  "Wi-Fi で iPhone に接続できませんでした。iPhone の画面を点けて、もう一度接続してください": "Could not connect to the iPhone over Wi-Fi. Turn on its screen and connect again",
+  "iPhone のマイクかカメラが使用中（通話・カメラ・録音など）のため、iOS が画面の映像を出せません":
+    "iOS cannot give the screen video while the iPhone's microphone or camera is in use (a call, the camera, recording)",
+  "iPhone との接続が切れました（画面の映像が届かなくなりました）": "The connection to the iPhone was lost (the screen video stopped arriving)",
+  "iPhone との接続が終わりました": "The connection to the iPhone ended",
+  "iPhone に操作を送れませんでした": "Could not send the operation to the iPhone",
+  "iPhone との接続が切れました（操作を送れなくなりました）": "The connection to the iPhone was lost (operations could not be sent)",
+  "iPhone のロック状態を確認できませんでした": "Could not check whether the iPhone is locked",
+  "iPhone にキーボードをつなげませんでした。もう一度試してください": "Could not connect the keyboard to the iPhone. Try again",
+  "iPhone がロックされているため、アプリを開けません。ロックを解除してください": "The iPhone is locked, so the app cannot open. Unlock it",
+  "iPhone はロック中です。ロック解除はユーザーに依頼してください（パスコードは入力しません）": "The iPhone is locked. Ask the user to unlock it (the passcode is not entered)",
+  "iPhoneからの応答がタイムアウトしました": "The iPhone did not respond in time",
+  "先に USB で接続してください": "Connect over USB first",
+  "ペアリングできませんでした: {error}": "Could not pair: {error}",
+  "ペアリングの記録を保存できませんでした": "Could not save the pairing record",
+  // clipboard
+  "iPhone のクリップボードは空です（または対応していない形式です）": "The iPhone's clipboard is empty (or in an unsupported format)",
+  "PC のクリップボードは空です": "The PC's clipboard is empty",
+  "PC のクリップボードが他のアプリに使用中です": "Another app is using the PC's clipboard",
+  "履歴にありません": "Not in the history",
+  "クリップボード取得を停止しました": "Stopped getting the clipboard",
+  "クリップボード取得が中止されました": "Getting the clipboard was cancelled",
+  "クリップボード取得を停止しました（WDAの状態が変わりました）": "Stopped getting the clipboard (WDA changed state)",
+  "iPhoneのロック状態を確認できないため、クリップボード取得を停止しました": "Stopped getting the clipboard: could not check whether the iPhone is locked",
+  "iPhoneの画面を確認できないため、クリップボード取得を停止しました": "Stopped getting the clipboard: could not check the iPhone's screen",
+  "ロック画面のため、クリップボード取得を停止しました": "Stopped getting the clipboard: the Lock Screen is shown",
+  "ictrlcopy の呼び出しはキーボード接続だけに対応しています": "Running ictrlcopy works only with the keyboard method",
+  // screenshots
+  "保存先の変更は iCtrl の画面から行ってください": "Change the save folder from the iCtrl screen",
+  "保存したスクリーンショットがありません": "No screenshot has been saved",
+  "保存先はフォルダーの完全なパスで指定してください": "Give the save folder as a full path",
+  "保存先がフォルダーではありません": "The save location is not a folder",
+  "{name} が見つかりません": "{name} was not found",
+  "エクスプローラーで開けませんでした ({code})": "Could not open it in File Explorer ({code})",
+  "フォルダーの選択画面を開けませんでした ({code})": "Could not open the folder picker ({code})",
+  "フォルダーを選べませんでした ({code})": "Could not choose the folder ({code})",
+  "選んだ場所はフォルダーとして使えません": "The chosen place cannot be used as a folder",
+  // passcode
+  "パスコードの操作は iCtrl のウィンドウからだけ行えます（AI からは使えません）": "Passcode actions work only from the iCtrl window (not from the AI)",
+  "このパスコード操作は利用できません": "This passcode action is not available",
+  "XCTest 以外のパスコード入力には対応していません": "Only XCTest passcode requests are supported",
+  "自動入力の対象は XCTest の要求だけです": "Automatic entry is only for XCTest requests",
+  "Windows 資格情報を読み取れませんでした": "Could not read the Windows credential",
+  "Windows 資格情報を保存できませんでした": "Could not save the Windows credential",
+  "Windows 資格情報を削除できませんでした": "Could not delete the Windows credential",
+  "パスコードを入力中です": "The passcode is being entered",
+  "パスコードは英数字 4〜32 文字で指定してください": "The passcode must be 4 to 32 letters or digits",
+  "パスコードの入力に失敗しました（再試行はしません）": "Entering the passcode failed (no retry)",
+  "自動入力の設定を読み取れません。ウィンドウで設定し直してください": "Cannot read the automatic entry setting. Set it again in the window",
+  "自動入力を使う iPhone に接続してください": "Connect the iPhone to use automatic entry with",
+  "先にパスコードを保存してください": "Save the passcode first",
+  "保存済みパスコードを確認し、設定し直してください": "Check the saved passcode and set it again",
+  "別のパスコード入力または設定変更のため停止しました": "Stopped for another passcode entry or a settings change",
+  "入力または映像・通話の状態が変わったため停止しました": "Stopped because input, video or call state changed",
+  "XCTest のパスコード入力画面を確認できないため、入力しません": "The XCTest passcode screen could not be confirmed, so nothing is entered",
+  "保存済みパスコードを確認してください": "Check the saved passcode",
+  "自動入力が停止されたため、入力しませんでした": "Automatic entry was stopped, so nothing was entered",
+  "XCTest の入力画面が変わったため、入力しませんでした": "The XCTest entry screen changed, so nothing was entered",
+  "XCTest の自動入力を停止しました。アクセシビリティで入力画面を確認できませんでした": "Stopped XCTest automatic entry: accessibility could not confirm the entry screen",
+  "パスコード入力を停止しました": "Stopped entering the passcode",
+  "キーの状態が変わったため、パスコード入力を停止しました": "Stopped entering the passcode because the key state changed",
+  "パスコード入力を停止しました（再送はしません）": "Stopped entering the passcode (not sent again)",
+  // WebDriverAgent
+  "iCtrl WDA（WebDriverAgent）が iPhone に入っていません。README の「補助アプリ（WebDriverAgent）を入れる」の手順で入れてください":
+    "iCtrl WDA (WebDriverAgent) is not on the iPhone. Install it with the README's steps for the helper app (WebDriverAgent)",
+  "iCtrl WDA（WebDriverAgent）が {seconds} 秒以内に起動しませんでした。XCTest のパスコード要求が出ている場合は、iCtrl のパスコード設定と自動入力の状態を確認してください。要求が出ていなければ、Sideloadly か AltStore で iCtrl WDA を入れ直してください: {detail}":
+    "iCtrl WDA (WebDriverAgent) did not start within {seconds} seconds. If an XCTest passcode request is shown, check iCtrl's passcode setting and automatic entry. If not, reinstall iCtrl WDA with Sideloadly or AltStore: {detail}",
+  "WebDriverAgent の応答が途中で切れました（終了した可能性があります）": "WebDriverAgent's response was cut off (it may have ended)",
+  "iCtrl WDA（WebDriverAgent）の署名が切れているか、信頼されていないため起動できません。Sideloadly か AltStore で iCtrl WDA を入れ直してください（AltStore なら更新）: {detail}":
+    "iCtrl WDA (WebDriverAgent) cannot start: its signature expired or it is not trusted. Reinstall iCtrl WDA with Sideloadly or AltStore (refresh it in AltStore): {detail}",
+  "iCtrl WDA（WebDriverAgent）が起動直後に終了しました。iPhone のロックを解除してから、もう一度試してください（続く場合は Sideloadly か AltStore で入れ直す）: {detail}":
+    "iCtrl WDA (WebDriverAgent) ended right after starting. Unlock the iPhone and try again (if it continues, reinstall it with Sideloadly or AltStore): {detail}",
+  "Windows の文字認識（OCR）が使えません": "Windows text recognition (OCR) is not available",
+};
 
 const EN_HTML = {
   shIntro: "To bring text you copy on the iPhone to the PC right away, the iPhone needs the shortcut \"<b>ictrlcopy</b>\". It was not found, or it did not respond.",
