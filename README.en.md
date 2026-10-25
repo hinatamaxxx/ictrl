@@ -6,9 +6,9 @@ iCtrl lets the AI on your PC (such as Claude) operate your iPhone. Ask Claude so
 
 | Claude using the iPhone's Calculator | The iPhone's screen on the PC |
 |---|---|
-| ![The iCtrl screen while Claude calculates 12×34 in Calculator; "AI が操作中" (AI at work) at the top and purple dots where Claude pressed](docs/screenshots/ai-calculator.jpg) | ![The iPhone's Home Screen shown in iCtrl](docs/screenshots/home.jpg) |
+| ![The iCtrl screen while Claude calculates 12×34 in Calculator; "AI at work" at the top and purple dots where Claude pressed](docs/screenshots/en/ai-calculator.jpg) | ![The iPhone's Home Screen shown in iCtrl](docs/screenshots/en/home.jpg) |
 
-"AI が操作中" (AI at work) shows at the top, and a purple dot appears where Claude presses.
+"AI at work" shows at the top, and a purple dot appears where Claude presses.
 
 ## What it does
 
@@ -136,8 +136,8 @@ On the iPhone, open the Settings app and show the Wi-Fi screen.
 ```
 
 - When Claude starts using iCtrl, it opens the iCtrl screen in the browser on the right side of the app, so you can watch the iPhone and what Claude does.
-- While Claude works, the iCtrl screen shows "AI が操作中" (AI at work) at the top, and a purple dot where Claude touches.
-- Press the ✕ on "AI が操作中" to stop it at once. Use the mouse to take over at any time.
+- While Claude works, the iCtrl screen shows "AI at work" at the top, and a purple dot where Claude touches.
+- Press the ✕ on "AI at work" to stop it at once. Use the mouse to take over at any time.
 - Claude never enters the iPhone's passcode.
 
 ### Install the helper app (WebDriverAgent)
@@ -218,8 +218,8 @@ We recommend turning off "Allow Running When Locked" in the settings of ictrlcop
 |---|---|
 | USB does not connect | Is the Apple Devices app installed? Reconnect the cable and tap "Trust" on the iPhone |
 | Wi-Fi does not connect | Have you connected over USB once? Are the PC and the iPhone on the same Wi-Fi network? |
-| "デベロッパモードを有効にしてください" (turn on Developer Mode) | Turn on Settings › Privacy & Security › Developer Mode on the iPhone |
-| The screen does not show | During a phone or LINE call, or while recording, the iPhone sends no screen. Press "画面を映す" (Show screen) afterwards |
+| "Turn on Developer Mode on the iPhone" | Turn on Settings › Privacy & Security › Developer Mode on the iPhone |
+| The screen does not show | During a phone or LINE call, or while recording, the iPhone sends no screen. Press "Show the screen" afterwards |
 | Claude cannot use iCtrl | Restart the Claude app. The first start takes about 20 seconds |
 | You use AdGuard and the connection drops | AdGuard's localhost filtering can interfere. See [the technical notes](docs/technical.md#windows-での通信の落とし穴adguard-など) (Japanese) |
 | Typing English switches to Japanese | This happens with the Meltype input method. Switch the Windows input method to Microsoft IME or another (Windows key + Space) |

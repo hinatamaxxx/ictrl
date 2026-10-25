@@ -115,8 +115,8 @@ const SERVER = {
     "Could not connect to the iPhone. Connect again (if it keeps happening, replug the cable or restart the iPhone)",
   "iPhoneのデベロッパモードを有効にしてください（設定 > プライバシーとセキュリティ）":
     "Turn on Developer Mode on the iPhone (Settings > Privacy & Security)",
-  "iCtrl の部品の版が合わないため接続できません。setup.ps1 をもう一度実行してください":
-    "Cannot connect because iCtrl's components do not match. Run setup.ps1 again",
+  "iCtrl の部品の版が合わないため接続できません。iCtrl を更新してください（プラグインは「claude plugin update ictrl@ictrl」、アプリとして入れた場合は setup.ps1 をもう一度実行）":
+    "Cannot connect because iCtrl's components do not match. Update iCtrl (the plugin: \"claude plugin update ictrl@ictrl\"; installed as an app: run setup.ps1 again)",
   "iPhone の画面を操作する準備ができませんでした。もう一度接続してください": "Could not get ready to control the iPhone's screen. Connect again",
   "USB でつながった iPhone が見つかりません。ケーブルと、Apple Devices アプリが入っているかを確かめてください":
     "No iPhone found over USB. Check the cable and that the Apple Devices app is installed",

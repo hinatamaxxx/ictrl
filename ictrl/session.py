@@ -254,7 +254,7 @@ class DeviceSession:
         self._stack.push_async_callback(tunnel.aclose)
         watcher = getattr(tunnel, "_transport_watcher", None)
         if watcher is None:
-            raise SessionError("iCtrl の部品の版が合わないため接続できません。setup.ps1 をもう一度実行してください")
+            raise SessionError("iCtrl の部品の版が合わないため接続できません。iCtrl を更新してください（プラグインは「claude plugin update ictrl@ictrl」、アプリとして入れた場合は setup.ps1 をもう一度実行）")
         watcher.add_done_callback(
             lambda _t: self.lost(self._link_lost_message()))
         self._enable_nodelay(tunnel.tun)
